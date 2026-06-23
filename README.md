@@ -2,6 +2,22 @@
 
 [中文](README.zh.md) | English
 
+> 如果你也是那种  
+> 喜欢分享情绪和感受、随手记下某个瞬间的小孩；  
+> 如果你也想在抬头就能望见天花板的空间里，  
+> 造一座属于自己的小窝——  
+> 那些美好的、快乐的、不好的、悲伤的，  
+> 就把它们当作一颗颗星星，挂在这里吧……  
+> （未完待续）
+>
+> If you too are one of those  
+> who love to share feelings and capture moments on a whim;  
+> If you too want to build a little nest of your own  
+> in that space where you look up and see nothing but the ceiling—  
+> then let every beautiful, joyful, painful, or sorrowful moment  
+> become a star, and hang it right here…  
+> (to be continued)
+
 > So everything that makes me whole  
 > 今君に捧げよう  
 > I'm Yours
