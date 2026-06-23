@@ -1,0 +1,27 @@
+---
+import WidgetLayout from "../common/WidgetLayout.astro";
+import { i18n } from "../../../i18n/translation";
+import I18nKey from "../../../i18n/i18nKey";
+
+interface Props { class?: string; style?: string; }
+---
+
+<WidgetLayout name={i18n(I18nKey.tags)} id="tags" class={Astro.props.class} style={Astro.props.style}>
+	<div id="memos-tag-cloud" class="flex gap-2 flex-wrap"></div>
+</WidgetLayout>
+
+<script is:inline>
+	(function(){
+		fetch("/api/v1/memos?pageSize=200").then(function(r){return r.ok?r.json():Promise.reject()}).then(function(d){
+			var memos=d.memos||[],counts={};
+			memos.forEach(function(m){(m.tags||[]).forEach(function(t){counts[t]=(counts[t]||0)+1})});
+			var sorted=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]}).slice(0,15);
+			if(!sorted.length)return;
+			var el=document.getElementById("memos-tag-cloud");
+			if(!el)return;
+			el.innerHTML=sorted.map(function(t){
+				return '<a href="#" class="btn-regular h-8 text-sm px-3 rounded-lg">'+t+' <span class="opacity-40 text-xs">'+counts[t]+'</span></a>'
+			}).join("");
+		}).catch(function(){});
+	})();
+</script>

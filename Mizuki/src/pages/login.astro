@@ -1,0 +1,46 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+
+const title = "Login";
+---
+
+<MainGridLayout title={title} description="管理员登录">
+	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+		<div class="card-base z-10 relative w-full overflow-hidden">
+			<div class="px-6 sm:px-9 py-6">
+				<div class="rounded-xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark,var(--primary))] p-5 sm:p-6">
+					<div class="flex items-center justify-between gap-4">
+						<div class="min-w-0">
+							<h1 class="text-2xl sm:text-3xl font-bold text-white mb-1 drop-shadow-sm">管理员登录</h1>
+							<p class="text-sm sm:text-base text-white/80">输入 API Key 获取编辑权限</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="px-6 sm:px-9 pt-2 pb-6 max-w-md mx-auto">
+				<div class="space-y-4">
+					<input type="password" id="apikey-input" placeholder="输入 API Key"
+						class="w-full p-3 rounded-xl border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 text-black/90 dark:text-white/90 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]" />
+					<button id="login-btn"
+						class="w-full px-4 py-3 rounded-xl text-sm text-white bg-[var(--primary)] hover:opacity-90 font-medium">
+						登录
+					</button>
+					<p id="login-msg" class="text-sm text-center text-black/50 dark:text-white/50 hidden"></p>
+				</div>
+			</div>
+		</div>
+	</div>
+</MainGridLayout>
+
+<script is:inline>
+	document.getElementById("login-btn").onclick = function() {
+		var key = document.getElementById("apikey-input").value.trim();
+		if (!key) return;
+		document.cookie = "memos_key=" + key + "; path=/; max-age=86400; SameSite=Lax";
+		var msg = document.getElementById("login-msg");
+		msg.textContent = "已设置，请刷新页面。编辑按钮将出现。";
+		msg.className = "text-sm text-center text-green-500";
+		msg.classList.remove("hidden");
+		setTimeout(function(){ window.location.href = "/ticker/"; }, 1000);
+	};
+</script>

@@ -1,0 +1,19 @@
+# ─── Personal Data ────────────────────────────────
+memos-data/
+memos/
+*.db
+*.sqlite
+
+# ─── Environment & Secrets ────────────────────────
+.env
+.env.*
+!Mizuki/.env.example
+
+# ─── Logs ─────────────────────────────────────────
+*.log
+logs/
+
+# ─── OS Files ─────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini

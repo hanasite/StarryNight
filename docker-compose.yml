@@ -1,0 +1,30 @@
+services:
+  memos:
+    image: neosmemo/memos:stable
+    container_name: memos
+    restart: unless-stopped
+    volumes:
+      - /vol1/1000/kakunsblogweb/memos-data:/var/opt/memos
+    environment:
+      - MEMOS_PORT=5230
+      - MEMOS_DRIVER=sqlite
+    networks:
+      - blog-net
+
+  nginx:
+    image: nginx:alpine
+    container_name: blog-nginx
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - /vol1/1000/kakunsblogweb/www:/usr/share/nginx/html:ro
+      - /vol1/1000/kakunsblogweb/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - blog-net
+    depends_on:
+      - memos
+
+networks:
+  blog-net:
+    driver: bridge

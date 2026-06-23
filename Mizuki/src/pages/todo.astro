@@ -1,0 +1,56 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+import { siteConfig } from "../config";
+
+if (!(siteConfig.featurePages as any).todo) return Astro.redirect("/404/");
+
+const memosToken = (siteConfig as any).memosToken || import.meta.env.MEMOS_TOKEN || "";
+const title = "TODO";
+const subtitle = "待办清单 · 记录和追踪任务进度";
+---
+
+<MainGridLayout title={title} description={subtitle}>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script is:inline src="/lib/memos-client.js"></script>
+	<script is:inline src="/lib/memo-form.js"></script>
+	<script is:inline src="/lib/todo-templates.js"></script>
+
+	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+		<div class="card-base z-10 relative w-full overflow-hidden">
+			<div class="px-6 sm:px-9 py-6">
+				<div class="rounded-xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark,var(--primary))] p-5 sm:p-6">
+					<div class="flex items-center justify-between gap-4">
+						<div class="min-w-0">
+							<h1 class="text-2xl sm:text-3xl font-bold text-white mb-1 drop-shadow-sm">{title}</h1>
+							<p class="text-sm sm:text-base text-white/80">{subtitle}</p>
+						</div>
+						<div class="shrink-0 text-center">
+							<span class="memo-count block text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">--</span>
+							<span class="block text-xs sm:text-sm text-white/70">Tasks</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="px-6 sm:px-9 pt-2 pb-6">
+				<div id="tag-cloud" class="mb-4"></div>
+			<div id="memo-list" class="space-y-4" data-filter="tags.exists(t,t==&quot;todo&quot;)" data-token={memosToken} data-minutes-ago="分钟前" data-hours-ago="小时前" data-days-ago="天前" data-just-now="刚刚"></div>
+				<div class="text-center mt-8 text-black/50 dark:text-white/50 text-sm italic">
+					使用 <code class="bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded">- [ ] 待办项</code> 语法创建任务
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script is:inline>
+		memosClient.init({ container: "memo-list", mode: "todo" });
+		memosClient.renderTagCloud("tag-cloud", null, 'tags.exists(t,t=="todo")');
+		memoForm.addFAB({
+			title: "新建清单",
+			placeholder: "- [ ] 任务...",
+			autoTag: "todo",
+			submitLabel: "创建",
+			templates: window.TODO_TEMPLATES
+		});
+	</script>
+</MainGridLayout>

@@ -1,0 +1,42 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { Icon } from "astro-icon/components";
+
+const title = "图床";
+const subtitle = "图片 + 文案 · 像朋友圈一样记录瞬间";
+---
+
+<MainGridLayout title={title} description={subtitle}>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script is:inline src="/lib/memos-client.js"></script>
+	<script is:inline src="/lib/memo-form.js"></script>
+
+	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+		<div class="card-base z-10 relative w-full overflow-hidden">
+			<div class="px-6 sm:px-9 py-6">
+				<div class="rounded-xl bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark,var(--primary))] p-5 sm:p-6">
+					<div class="flex items-center justify-between gap-4">
+						<div class="min-w-0">
+							<h1 class="text-2xl sm:text-3xl font-bold text-white mb-1 drop-shadow-sm">{title}</h1>
+							<p class="text-sm sm:text-base text-white/80">{subtitle}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="px-6 sm:px-9 pt-2 pb-6">
+				<div id="memo-list" class="space-y-4" data-filter="tags.exists(t,t==&quot;gallery&quot;)" data-token="memos_pat_Oj72Y8ohw1s2ejiyCFb3qyvoUgGmZGMl" data-minutes-ago="分钟前" data-hours-ago="小时前" data-days-ago="天前" data-just-now="刚刚"></div>
+			</div>
+		</div>
+	</div>
+
+	<script is:inline>
+		memosClient.init({ container: "memo-list", mode: "moment" });
+		memoForm.addFAB({
+			title: "发图文",
+			placeholder: "写点文案...",
+			autoTag: "gallery",
+			submitLabel: "发布",
+			showImage: true
+		});
+	</script>
+</MainGridLayout>
