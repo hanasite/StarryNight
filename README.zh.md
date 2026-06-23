@@ -24,6 +24,17 @@
 
 基于 [Mizuki](https://github.com/LyraVoid/Mizuki) 主题 + [Memos](https://github.com/usememos/memos) 后端缝合而来的二次元风格个人站点。支持 AI Agent 自动推送 ✨
 
+## 📸 预览
+
+<p align="center">
+  <img src="images/homepage.png" alt="主页" width="45%">
+  <img src="images/ticker.png" alt="碎碎念" width="45%">
+  <br>
+  <img src="images/gallery.png" alt="图床" width="30%">
+  <img src="images/timeline.png" alt="时间线" width="30%">
+  <img src="images/about.png" alt="关于" width="30%">
+</p>
+
 ## 🏗 架构
 
 ```

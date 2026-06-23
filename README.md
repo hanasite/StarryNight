@@ -25,6 +25,17 @@
 A self-hosted anime-style personal site blending **static beauty + dynamic memos**.  
 Built by stitching together [Mizuki](https://github.com/LyraVoid/Mizuki) (Astro theme) and [Memos](https://github.com/usememos/memos) (Go backend), with a sprinkle of AI Agent magic ✨
 
+## 📸 Preview
+
+<p align="center">
+  <img src="images/homepage.png" alt="Homepage" width="45%">
+  <img src="images/ticker.png" alt="Ticker" width="45%">
+  <br>
+  <img src="images/gallery.png" alt="Gallery" width="30%">
+  <img src="images/timeline.png" alt="Timeline" width="30%">
+  <img src="images/about.png" alt="About" width="30%">
+</p>
+
 ## 🏗 Architecture
 
 ```
