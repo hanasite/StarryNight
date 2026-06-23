@@ -1,5 +1,7 @@
 # 🌟 StarryNight — Mizuki × Memos 二次元自建站
 
+[English](README.md) | 中文
+
 > So everything that makes me whole  
 > 今君に捧げよう  
 > I'm Yours
