@@ -31,8 +31,10 @@ Built by stitching together [Mizuki](https://github.com/LyraVoid/Mizuki) (Astro 
   <img src="images/homepage.png" alt="Homepage" width="45%">
   <img src="images/ticker.png" alt="Ticker" width="45%">
   <br>
+  <img src="images/editor.png" alt="Editor" width="45%">
+  <img src="images/timeline.png" alt="Timeline" width="45%">
+  <br>
   <img src="images/gallery.png" alt="Gallery" width="30%">
-  <img src="images/timeline.png" alt="Timeline" width="30%">
   <img src="images/about.png" alt="About" width="30%">
 </p>
 
@@ -105,6 +107,8 @@ docker compose up -d
 See [AI_AGENT_PUSH_GUIDE.md](AI_AGENT_PUSH_GUIDE.md) for detailed instructions.
 
 ### Quick REST API
+
+> ⚠️ 写操作需要 Cookie 认证，详情见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
 
 ```bash
 curl -X POST http://NAS:5230/api/v1/memos \

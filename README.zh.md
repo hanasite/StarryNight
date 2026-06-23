@@ -30,8 +30,10 @@
   <img src="images/homepage.png" alt="主页" width="45%">
   <img src="images/ticker.png" alt="碎碎念" width="45%">
   <br>
+  <img src="images/editor.png" alt="编辑器" width="45%">
+  <img src="images/timeline.png" alt="时间线" width="45%">
+  <br>
   <img src="images/gallery.png" alt="图床" width="30%">
-  <img src="images/timeline.png" alt="时间线" width="30%">
   <img src="images/about.png" alt="关于" width="30%">
 </p>
 
@@ -104,6 +106,8 @@ docker compose up -d
 详细指南见 [AI_AGENT_PUSH_GUIDE.md](AI_AGENT_PUSH_GUIDE.md)。
 
 ### REST 接口速查
+
+> ⚠️ 写操作需要 Cookie 认证，详情见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
 
 ```bash
 curl -X POST http://NAS地址:5230/api/v1/memos \
