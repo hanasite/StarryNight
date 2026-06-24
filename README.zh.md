@@ -102,7 +102,7 @@ pnpm run preview
 ```text
 <!-- copy-from-here -->
 请阅读仓库里的 AGENT_DEPLOY.md，帮我完成 StarryNight 的部署。
-我的 NAS IP 是 ____，Memos Token 是 ____，Cookie Key 是 ____。
+部署过程中需要的 NAS IP、Memos Token、Cookie Key 请主动问我。
 <!-- copy-to-here -->
 ```
 

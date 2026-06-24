@@ -102,7 +102,7 @@ pnpm run preview
 ```text
 <!-- copy-from-here -->
 Please read AGENT_DEPLOY.md in this repo and deploy StarryNight for me.
-My NAS IP is ____, Memos Token is ____, Cookie Key is ____.
+Ask me for NAS IP, Memos Token, and Cookie Key when needed.
 <!-- copy-to-here -->
 ```
 
