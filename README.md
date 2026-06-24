@@ -99,12 +99,14 @@ pnpm run preview
 
 ### 🤖 Agent Deploy
 
-> 📋 **Copy this to your AI agent to deploy:**
->
-> Please read [AGENT_DEPLOY.md](AGENT_DEPLOY.md) in this repo and deploy StarryNight for me.
-> My NAS IP is ____, Memos Token is ____, Cookie Key is ____.
+```text
+<!-- copy-from-here -->
+Please read AGENT_DEPLOY.md in this repo and deploy StarryNight for me.
+My NAS IP is ____, Memos Token is ____, Cookie Key is ____.
+<!-- copy-to-here -->
+```
 
-Manual deploy: [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md).
+> Copy the text inside the code block above and send to your AI agent.
 
 ### AI Agent Push
 

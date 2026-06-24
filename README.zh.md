@@ -99,12 +99,14 @@ pnpm run preview
 
 ### 🤖 一键部署
 
-> 📋 **复制这一段发给你的 AI Agent，让他帮你部署：**
-> 
-> 请阅读仓库里的 [AGENT_DEPLOY.md](AGENT_DEPLOY.md)，帮我完成 StarryNight 的部署。
-> 我的 NAS IP 是 ____，Memos Token 是 ____，Cookie Key 是 ____。
+```text
+<!-- copy-from-here -->
+请阅读仓库里的 AGENT_DEPLOY.md，帮我完成 StarryNight 的部署。
+我的 NAS IP 是 ____，Memos Token 是 ____，Cookie Key 是 ____。
+<!-- copy-to-here -->
+```
 
-手动部署详见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)。
+> 上面代码块里的文字复制给 AI Agent 即可。手动部署详见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)。
 
 ### AI Agent 推送
 
