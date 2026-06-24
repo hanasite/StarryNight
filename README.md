@@ -99,10 +99,14 @@ pnpm run preview
 
 ### NAS Production Deploy
 
-See [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md) for full deployment guide.
+```bash
+# One-click build + push (AI Agent friendly)
+bash deploy.sh
+```
+
+See [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md) for full guide. Docker:
 
 ```bash
-# Quick deploy with docker-compose
 docker compose up -d
 ```
 

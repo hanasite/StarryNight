@@ -99,10 +99,14 @@ pnpm run preview
 
 ### NAS 线上部署
 
-完整部署指南见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
+```bash
+# 一键构建 + 推送（Agent / 手动通用）
+bash deploy.sh
+```
+
+完整指南见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)。Docker 启动：
 
 ```bash
-# docker-compose 一键启动
 docker compose up -d
 ```
 

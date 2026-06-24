@@ -193,7 +193,18 @@ node ../dev-server.js  # 代理 /api/* → Memos
 
 `dev-server.js` 的 `/lib/` 文件从 `public/` 直接读取，修改 JS 无需重建。
 
-### NAS 部署
+### 一键部署（Agent）
+
+```bash
+# PC 项目根目录，设置环境变量后一键推送
+export MEMOS_TOKEN="memos_pat_xxx"
+export COOKIE_KEY="your-secret-key"
+bash deploy.sh
+```
+
+`deploy.sh` 自动完成：构建 → 上传 → 替换 token → 修权限 → 重启 nginx。
+
+### NAS 手动部署
 
 详见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
 
