@@ -70,7 +70,8 @@ Content is automatically categorized by Memos tags — no manual sorting needed:
 - **Anime MD3 UI** — Beautiful Material Design 3 visuals with anime aesthetic
 - **Markdown editor** — Quick toolbar (headings, bold, code, dividers, etc.)
 - **Lightweight self-hosted** — Run on NAS, VPS, or any Linux server
-- **Daily random banner** — Optional 《Steins;Gate》-style digital clock widget
+- **Daily random banner** — cron-based random image carousel from your pool
+- **Nixie tube clock** — Steins;Gate style widget (⚠️ known issue: clock may freeze after page refresh, WIP)
 - **Dual auth** — Browser Cookie for web, Bearer Token for API/AI
 - **AI Agent integration** — MCP protocol allows AI to read/write Memos automatically
 - **REST API** — Full CRUD via curl, scripts, or any HTTP client
