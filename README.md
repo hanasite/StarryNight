@@ -136,6 +136,10 @@ Perfect for anyone who:
 | Runtime | Docker, Docker Compose |
 | Automation | Bash, MCP Protocol |
 
+## 🔧 Developer Guide
+
+See [DEV_GUIDE.md](DEV_GUIDE.md) for architecture, customization, and APIs.
+
 ## 📜 License
 
 MIT

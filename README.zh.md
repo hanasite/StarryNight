@@ -136,6 +136,10 @@ echo "今晚的星星真美 #ticker" | curl -X POST \
 | 运行环境 | Docker、Docker Compose |
 | 自动化 | Bash、MCP 协议 |
 
+## 🔧 二次开发指南
+
+详见 [DEV_GUIDE.md](DEV_GUIDE.md) — 项目架构、静态/动态修改方法、Mizuki 与 Memos 参考。
+
 ## 📜 开源协议
 
 MIT
