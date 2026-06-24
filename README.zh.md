@@ -8,21 +8,14 @@
 > 造一座属于自己的小窝——  
 > 那些美好的、快乐的、不好的、悲伤的，  
 > 就把它们当作一颗颗星星，挂在这里吧……  
-> （未完待续）
->
-> If you too are one of those  
-> who love to share feelings and capture moments on a whim;  
-> If you too want to build a little nest of your own  
-> in that space where you look up and see nothing but the ceiling—  
-> then let every beautiful, joyful, painful, or sorrowful moment  
-> become a star, and hang it right here…  
-> (to be continued)
 
 > So everything that makes me whole  
 > 今君に捧げよう  
 > I'm Yours
 
-基于 [Mizuki](https://github.com/LyraVoid/Mizuki) 主题 + [Memos](https://github.com/usememos/memos) 后端缝合而来的二次元风格个人站点。支持 AI Agent 自动推送 ✨
+**StarryNight** 是一个二次元风格的自建个人站点，融合**静态美观页面 + 动态记事功能**，基于 [Mizuki](https://github.com/LyraVoid/Mizuki)（Astro MD3 主题）和 [Memos](https://github.com/usememos/memos)（Go 轻量后端）搭建，还配套 AI 助手联动能力。
+
+**项目寓意：** 把生活里快乐、难过、细碎的所有瞬间都化作星星，存放在自己搭建的专属小窝里 ✨
 
 ## 📸 预览
 
@@ -37,128 +30,115 @@
   <img src="images/about.png" alt="关于" width="30%">
 </p>
 
-## 🏗 架构
+## 🏗 技术架构
 
 ```
-浏览器 → Nginx :3000 → Mizuki 静态文件
-                       → /api/* → Memos :5230
-                       → /mcp  → Memos MCP（AI Agent 调用）
+浏览器 → Nginx :3000 → Mizuki 静态页面
+                       → /api/* → Memos :5230（REST API）
+                       → /mcp  → Memos :5230（AI Agent MCP 接口）
 
-AI Agent → Memos :5230/mcp   (MCP 协议)
-         → Memos :5230/api/v1/memos (REST 接口)
+AI Agent → REST API /api/v1/memos  (curl/脚本调用)
+         → MCP Protocol /mcp       (AI 原生接口)
 ```
 
-## 📄 页面
+**核心组件：**
 
-| 路径 | 功能 | 数据来源 |
-|------|------|----------|
+| 组件 | 角色 | 技术 |
+|------|------|------|
+| **Mizuki** | 前端静态主题 | Astro、MD3 设计、二次元风格 |
+| **Memos** | 后端数据服务 | Go、REST API、MCP、SQLite |
+| **Nginx** | 反向代理 & 静态资源分发 | 统一路由、注入认证头 |
+| **daily-banner.sh** | 定时任务 | 每日随机轮播横幅图 |
+
+## 📄 页面 & 内容来源
+
+通过给 Memos 内容打上不同标签，自动归类到对应页面，无需手动分栏：
+
+| 路径 | 功能 | 标签 |
+|------|------|------|
 | `/` | 首页 · 横幅轮播 | 静态 + 每日随机图 |
-| `/ticker/` | 碎碎念 | Memos `#ticker` |
-| `/blog/` | 博文 | Memos `#blog` |
-| `/todo/` | 待办清单 | Memos `#todo` |
-| `/gallery/` | 图床 | Memos `#gallery` |
-| `/timeline/` | 历程时间线 | 静态 + Memos `#milestone` |
-| `/about/` | 关于本站 | 静态 |
+| `/ticker/` | 碎碎念 | `#ticker` |
+| `/blog/` | 博文 | `#blog` |
+| `/todo/` | 待办清单 | `#todo` |
+| `/gallery/` | 图库 | `#gallery` |
+| `/timeline/` | 时间历程 | 静态 + `#milestone` |
+| `/about/` | 关于我 | 静态 |
+
+## ✨ 核心特色
+
+- **二次元 MD3 视觉风格** — Material Design 3 × 动漫美学
+- **Markdown 编辑器** — 标题、粗体、代码、分割线等一键插入
+- **轻量化自建部署** — NAS、VPS、任何 Linux 服务器均可运行
+- **每日随机横幅图** — 可选《命运石之门》风格数码管时钟小组件
+- **双认证体系** — 浏览器 Cookie 登录 / Token 接口调用
+- **AI Agent 联动** — 通过 MCP 协议让 AI 自动读写 Memos
+- **标准 REST API** — 支持 curl、脚本等远程操作
 
 ## 🚀 快速开始
 
 ### 环境要求
 - Node.js 18+ / pnpm
 - Docker & Docker Compose
-- 一台 NAS 或服务器（已测试：飞牛OS）
+- 一台 NAS 或 Linux 服务器
 
-### 本地开发
+### 本地开发调试
 
 ```bash
-# 1. 启动 Memos
+# 1. 启动 Memos 后端
 docker run -d --name memos -p 5230:5230 \
   -v ~/.memos:/var/opt/memos \
   neosmemo/memos:stable
 
-# 2. 构建并启动
+# 2. 构建并启动前端
 cd Mizuki
 pnpm install
-pnpm build
-node ../dev-server.js
-
-# 3. 浏览器打开 http://localhost:3000
+pnpm run build
+pnpm run preview
 ```
 
-### 部署到 NAS
+### NAS 线上部署
+
+完整部署指南见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
 
 ```bash
-# 1. PC 上构建
-cd Mizuki && pnpm build
-
-# 2. 复制到 NAS
-scp -r dist/* user@nas:/volume1/docker/blog/www/
-scp docker-compose.yml nginx.conf user@nas:/volume1/docker/blog/
-
-# 3. 编辑 nginx.conf → 替换 YOUR_MEMOS_TOKEN 和 YOUR_COOKIE_KEY
-
-# 4. NAS 上启动
-cd /volume1/docker/blog
+# docker-compose 一键启动
 docker compose up -d
 ```
 
-## 🤖 AI Agent 推送
+### AI Agent 推送
 
-详细指南见 [AI_AGENT_PUSH_GUIDE.md](AI_AGENT_PUSH_GUIDE.md)。
-
-### REST 接口速查
-
-> ⚠️ 写操作需要 Cookie 认证，详情见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
+AI 接入文档见 [AI_AGENT_PUSH_GUIDE.md](AI_AGENT_PUSH_GUIDE.md)
 
 ```bash
-curl -X POST http://NAS地址:5230/api/v1/memos \
-  -H "Authorization: Bearer <TOKEN>" \
+# 通过 API 发布一条碎碎念
+echo "今晚的星星真美 #ticker" | curl -X POST \
   -H "Content-Type: application/json" \
-  -d '{"content":"今天天气真好 #ticker","visibility":"PUBLIC"}'
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d @- http://localhost:5230/api/v1/memos
 ```
 
-### 标签速查
+## 🎯 适用人群
 
-| 标签 | 对应页面 |
-|-----|-----------|
-| `#ticker` | `/ticker/` |
-| `#blog` | `/blog/` |
-| `#todo` | `/todo/` |
-| `#gallery` | `/gallery/` |
-| `#milestone` | `/timeline/` |
+适合这样的你：
+- 喜欢记录日常、随笔、图文、待办
+- 想要完全私有化自建二次元个人博客
+- 不想使用第三方平台
+- 有 NAS/服务器，喜欢折腾自建站点
 
-## 🎨 特性
+## 📦 技术栈
 
-- **Mizuki** 二次元 Astro 主题，Material Design 3 风格
-- **Memos** 轻量 Go 后端，REST API + MCP 双通道
-- **每日随机轮播** — NAS 定时从素材库随机抽取图片
-- **Markdown 工具栏** — 快捷插入标题、粗体、代码、删除线、分割线
-- **Cookie 认证** 浏览器端 · **PAT Token** Agent 端
-- **辉光管时钟** Steins;Gate 风格（可选）
+| 层级 | 技术 |
+|------|------|
+| 前端 | Astro、Mizuki 主题、MD3 |
+| 后端 | Go、Memos、SQLite |
+| 反向代理 | Nginx (Alpine) |
+| 运行环境 | Docker、Docker Compose |
+| 自动化 | Bash、MCP 协议 |
 
-## 📂 项目结构
+## 📜 开源协议
 
-```
-StarryNight/
-├── Mizuki/                 # Astro 前端（魔改自 Mizuki 主题）
-├── docker-compose.yml      # Docker 编排（Nginx + Memos）
-├── nginx.conf              # 反向代理配置（含认证）
-├── dev-server.js           # 本地开发代理服务器
-├── daily-banner.sh         # NAS 每日随机轮播脚本
-├── README.md               # 英文说明
-├── README.zh.md            # 中文说明（本文件）
-├── AI_AGENT_PUSH_GUIDE.md  # AI Agent 推送指南
-└── DEPLOY_TO_NAS.md        # NAS 部署指南
-```
-
-## 🙏 致谢
-
-- **[Mizuki](https://github.com/LyraVoid/Mizuki)** — 超棒的 Astro 二次元主题
-- **[Memos](https://github.com/usememos/memos)** — 轻量自建备忘录
-- **[Claude Code](https://claude.ai/code)** — AI 编程搭子，全程陪跑
+MIT
 
 ---
 
-<p align="center">
-  <b>开源万岁！</b> 🌟<br>
-  made with ❤️ by <a href="https://github.com/hanasite">hanasite</a>
-</p>
+*用 ❤️ 制作 by [Kakun](https://github.com/hanasite)*

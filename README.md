@@ -8,22 +8,14 @@
 > 造一座属于自己的小窝——  
 > 那些美好的、快乐的、不好的、悲伤的，  
 > 就把它们当作一颗颗星星，挂在这里吧……  
-> （未完待续）
->
-> If you too are one of those  
-> who love to share feelings and capture moments on a whim;  
-> If you too want to build a little nest of your own  
-> in that space where you look up and see nothing but the ceiling—  
-> then let every beautiful, joyful, painful, or sorrowful moment  
-> become a star, and hang it right here…  
-> (to be continued)
 
 > So everything that makes me whole  
 > 今君に捧げよう  
 > I'm Yours
 
-A self-hosted anime-style personal site blending **static beauty + dynamic memos**.  
-Built by stitching together [Mizuki](https://github.com/LyraVoid/Mizuki) (Astro theme) and [Memos](https://github.com/usememos/memos) (Go backend), with a sprinkle of AI Agent magic ✨
+**StarryNight** is an anime-style self-hosted personal site that blends **static pages with dynamic memos**. Built with [Mizuki](https://github.com/LyraVoid/Mizuki) (Astro MD3 theme) + [Memos](https://github.com/usememos/memos) (Go backend), plus AI Agent integration via MCP protocol.
+
+**Project meaning:** Turn every joyful, sorrowful, and tiny moment of life into stars, storing them in your own little nest ✨
 
 ## 📸 Preview
 
@@ -42,123 +34,111 @@ Built by stitching together [Mizuki](https://github.com/LyraVoid/Mizuki) (Astro 
 
 ```
 Browser → Nginx :3000 → Mizuki static files
-                       → /api/* → Memos :5230
-                       → /mcp  → Memos MCP (AI Agent)
+                       → /api/* → Memos :5230 (REST API)
+                       → /mcp  → Memos :5230 (MCP for AI Agent)
 
-AI Agent → Memos :5230/mcp   (MCP)
-         → Memos :5230/api/v1/memos (REST)
+AI Agent → REST API /api/v1/memos  (curl, scripts)
+         → MCP Protocol /mcp       (AI native interface)
 ```
 
-## 📄 Pages
+**Key components:**
 
-| Path | Content | Source |
-|------|---------|--------|
-| `/` | Home · banner carousel | static + daily random |
-| `/ticker/` | 碎碎念 (thoughts) | Memos `#ticker` |
-| `/blog/` | 博文 (posts) | Memos `#blog` |
-| `/todo/` | 待办 (checklist) | Memos `#todo` |
-| `/gallery/` | 图床 (images) | Memos `#gallery` |
-| `/timeline/` | 历程 (milestones) | static + Memos `#milestone` |
-| `/about/` | 关于 | static |
+| Component | Role | Tech |
+|-----------|------|------|
+| **Mizuki** | Frontend static theme | Astro, MD3 design, anime style |
+| **Memos** | Backend data service | Go, REST API, MCP, SQLite |
+| **Nginx** | Reverse proxy & static serving | Routes traffic, injects auth |
+| **daily-banner.sh** | Cron task | Random banner rotation |
+
+## 📄 Pages & Content Sources
+
+Content is automatically categorized by Memos tags — no manual sorting needed:
+
+| Path | Page | Tag |
+|------|------|-----|
+| `/` | Home · Banner carousel | Static + daily random |
+| `/ticker/` | 碎碎念 (Thoughts) | `#ticker` |
+| `/blog/` | 博文 (Posts) | `#blog` |
+| `/todo/` | 待办清单 (Todo) | `#todo` |
+| `/gallery/` | 图库 (Gallery) | `#gallery` |
+| `/timeline/` | 时间历程 (Timeline) | Static + `#milestone` |
+| `/about/` | 关于我 (About) | Static |
+
+## ✨ Features
+
+- **Anime MD3 UI** — Beautiful Material Design 3 visuals with anime aesthetic
+- **Markdown editor** — Quick toolbar (headings, bold, code, dividers, etc.)
+- **Lightweight self-hosted** — Run on NAS, VPS, or any Linux server
+- **Daily random banner** — Optional 《Steins;Gate》-style digital clock widget
+- **Dual auth** — Browser Cookie for web, Bearer Token for API/AI
+- **AI Agent integration** — MCP protocol allows AI to read/write Memos automatically
+- **REST API** — Full CRUD via curl, scripts, or any HTTP client
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+ / pnpm
 - Docker & Docker Compose
-- A NAS or server (tested on 飞牛OS)
+- A NAS or Linux server
 
 ### Local Dev
 
 ```bash
-# 1. Start Memos
+# 1. Start Memos backend
 docker run -d --name memos -p 5230:5230 \
   -v ~/.memos:/var/opt/memos \
   neosmemo/memos:stable
 
-# 2. Build & serve
+# 2. Build & serve frontend
 cd Mizuki
 pnpm install
-pnpm build
-node ../dev-server.js
-
-# 3. Open http://localhost:3000
+pnpm run build
+pnpm run preview
 ```
 
-### Deploy to NAS
+### NAS Production Deploy
+
+See [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md) for full deployment guide.
 
 ```bash
-# 1. Build on PC
-cd Mizuki && pnpm build
-
-# 2. Copy to NAS
-scp -r dist/* user@nas:/volume1/docker/blog/www/
-scp docker-compose.yml nginx.conf user@nas:/volume1/docker/blog/
-
-# 3. Edit nginx.conf → replace YOUR_MEMOS_TOKEN and YOUR_COOKIE_KEY
-
-# 4. Start on NAS
-cd /volume1/docker/blog
+# Quick deploy with docker-compose
 docker compose up -d
 ```
 
-## 🤖 AI Agent Push
+### AI Agent Push
 
-See [AI_AGENT_PUSH_GUIDE.md](AI_AGENT_PUSH_GUIDE.md) for detailed instructions.
-
-### Quick REST API
-
-> ⚠️ 写操作需要 Cookie 认证，详情见 [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md)
+See [AI_AGENT_PUSH_GUIDE.md](AI_AGENT_PUSH_GUIDE.md) for AI integration docs.
 
 ```bash
-curl -X POST http://NAS:5230/api/v1/memos \
-  -H "Authorization: Bearer <TOKEN>" \
+# Push a ticker via API
+echo "Hello StarryNight! #ticker" | curl -X POST \
   -H "Content-Type: application/json" \
-  -d '{"content":"Hello World #ticker","visibility":"PUBLIC"}'
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d @- http://localhost:5230/api/v1/memos
 ```
 
-### Tag Reference
+## 🎯 Target Audience
 
-| Tag | Appears on |
-|-----|-----------|
-| `#ticker` | `/ticker/` |
-| `#blog` | `/blog/` |
-| `#todo` | `/todo/` |
-| `#gallery` | `/gallery/` |
-| `#milestone` | `/timeline/` |
+Perfect for anyone who:
+- Loves journaling, photography, todo lists, and random thoughts
+- Wants a fully private, self-hosted anime-style blog
+- Doesn't want to rely on third-party platforms
+- Has a NAS or server and enjoys DIY tech
 
-## 🎨 Features
+## 📦 Tech Stack
 
-- **Mizuki** — beautiful MD3 anime-style Astro theme
-- **Memos** — lightweight Go backend with REST API + MCP
-- **Daily random banner** — picks 5-6 images from your pool via NAS cron
-- **MD toolbar** — quick insert headers, bold, code, strikethrough, separator
-- **Cookie auth** for browser · **PAT token** for agents
-- **Nixie tube clock** widget (Steins;Gate style, optional)
+| Layer | Tech |
+|-------|------|
+| Frontend | Astro, Mizuki Theme, MD3 |
+| Backend | Go, Memos, SQLite |
+| Proxy | Nginx (Alpine) |
+| Runtime | Docker, Docker Compose |
+| Automation | Bash, MCP Protocol |
 
-## 📂 Project Structure
+## 📜 License
 
-```
-StarryNight/
-├── Mizuki/                 # Astro frontend (forked & customized)
-├── docker-compose.yml      # Nginx + Memos containers
-├── nginx.conf              # Reverse proxy with auth
-├── dev-server.js           # Local dev proxy + static server
-├── daily-banner.sh         # NAS cron: daily random banner images
-├── README.md
-├── AI_AGENT_PUSH_GUIDE.md
-└── DEPLOY_TO_NAS.md
-```
-
-## 🙏 Credits
-
-- **[Mizuki](https://github.com/LyraVoid/Mizuki)** — the gorgeous Astro theme that started it all
-- **[Memos](https://github.com/usememos/memos)** — the lightweight memo hub
-- **[Claude Code](https://claude.ai/code)** — AI pair programming companion
+MIT
 
 ---
 
-<p align="center">
-  <b>开源万岁！</b> 🌟<br>
-  made with ❤️ by <a href="https://github.com/hanasite">hanasite</a>
-</p>
+*Made with ❤️ by [Kakun](https://github.com/hanasite)*
