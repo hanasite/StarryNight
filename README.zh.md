@@ -102,7 +102,7 @@ pnpm run preview
 
 ```text
 <!-- copy-from-here -->
-请阅读仓库里的 AGENT_DEPLOY.md，帮我完成 StarryNight 的部署。
+请阅读 https://github.com/hanasite/StarryNight 仓库里的 AGENT_DEPLOY.md，帮我完成 StarryNight 的部署。
 部署过程中需要的 NAS IP、Memos Token、Cookie Key 请主动问我。
 <!-- copy-to-here -->
 ```

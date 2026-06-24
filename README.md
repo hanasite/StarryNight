@@ -102,7 +102,7 @@ pnpm run preview
 
 ```text
 <!-- copy-from-here -->
-Please read AGENT_DEPLOY.md in this repo and deploy StarryNight for me.
+Please read AGENT_DEPLOY.md from https://github.com/hanasite/StarryNight and deploy StarryNight for me.
 Ask me for NAS IP, Memos Token, and Cookie Key when needed.
 <!-- copy-to-here -->
 ```
