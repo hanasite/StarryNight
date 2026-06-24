@@ -97,18 +97,14 @@ pnpm run build
 pnpm run preview
 ```
 
-### NAS Production Deploy
+### 🤖 Agent Deploy
 
-```bash
-# One-click build + push (AI Agent friendly)
-bash deploy.sh
-```
+> 📋 **Copy this to your AI agent to deploy:**
+>
+> Please read [AGENT_DEPLOY.md](AGENT_DEPLOY.md) in this repo and deploy StarryNight for me.
+> My NAS IP is ____, Memos Token is ____, Cookie Key is ____.
 
-See [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md) for full guide. Docker:
-
-```bash
-docker compose up -d
-```
+Manual deploy: [DEPLOY_TO_NAS.md](DEPLOY_TO_NAS.md).
 
 ### AI Agent Push
 
