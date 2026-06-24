@@ -56,6 +56,12 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 			class: "onload-animation",
 			animationDelay: 200,
 		},
+			{
+				type: "guestbook-link",
+				position: "top",
+				class: "onload-animation",
+				animationDelay: 225,
+			},
 		{
 			// 组件类型：站点统计组件
 			type: "site-stats",
@@ -80,9 +86,9 @@ export const sidebarLayoutConfig: SidebarLayoutConfig = {
 
 	// 侧栏组件布局配置
 	components: {
-		left: ["profile", "announcement", "card-toc"],
+		left: ["profile", "announcement", "card-toc", "guestbook-link"],
 		right: ["site-stats", "calendar", "categories", "music-sidebar"],
-		drawer: ["profile", "announcement", "music-sidebar", "categories"],
+		drawer: ["profile", "announcement", "music-sidebar", "categories", "guestbook-link"],
 	},
 
 	// 默认动画配置

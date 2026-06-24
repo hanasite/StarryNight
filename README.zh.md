@@ -62,6 +62,7 @@ AI Agent → REST API /api/v1/memos  (curl/脚本调用)
 | `/todo/` | 待办清单 | `#todo` |
 | `/gallery/` | 图库 | `#gallery` |
 | `/timeline/` | 时间历程 | 静态 + `#milestone` |
+| `/guestbook/` | 留言板 | Memos `#guestbook` |
 | `/about/` | 关于我 | 静态 |
 
 ## ✨ 核心特色

@@ -34,6 +34,11 @@ export const navBarConfig: NavBarConfig = {
 			icon: "material-symbols:photo-library",
 		},
 		{
+			name: "留言板",
+			url: "/guestbook/",
+			icon: "material-symbols:forum",
+		},
+		{
 			name: "About",
 			url: "/about/",
 			icon: "material-symbols:info",

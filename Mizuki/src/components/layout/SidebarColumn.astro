@@ -12,6 +12,7 @@ import { CardTOC } from "../widgets/card-toc";
 import Categories from "../widgets/categories/Categories.astro";
 import MusicPlayer from "../widgets/music-player/MusicPlayer.svelte";
 import { MusicSidebarWidget } from "../widgets/music-sidebar";
+import GuestbookLink from "../widgets/guestbook-link/GuestbookLink.astro";
 import Profile from "../widgets/profile/Profile.astro";
 import NixieClock from "../widgets/nixie-clock/NixieClock.astro";
 import SiteStats from "../widgets/site-stats/SiteStats.astro";
@@ -54,6 +55,7 @@ const componentMap: Record<string, unknown> = {
 	"music-sidebar": MusicSidebarWidget,
 	"site-stats": SiteStats,
 	calendar: Calendar,
+		"guestbook-link": GuestbookLink,
 		"nixie-clock": NixieClock,
 };
 

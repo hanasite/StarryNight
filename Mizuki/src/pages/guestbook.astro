@@ -1,0 +1,62 @@
+---
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+
+const title = "Guestbook";
+const subtitle = "留言板 · 来踩个脚印吧～";
+---
+
+<MainGridLayout title={title} description={subtitle}>
+	<script is:inline src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script is:inline src="/lib/memos-client.js"></script>
+	<script is:inline src="/lib/guestbook.js"></script>
+
+	<div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+		<div class="card-base z-10 relative w-full overflow-hidden">
+			<div class="px-6 sm:px-9 py-6">
+				<div class="rounded-xl bg-gradient-to-r from-pink-400 to-rose-500 p-5 sm:p-6">
+					<div class="flex items-center justify-between gap-4">
+						<div class="min-w-0">
+							<h1 class="text-2xl sm:text-3xl font-bold text-white mb-1 drop-shadow-sm">{title}</h1>
+							<p class="text-sm sm:text-base text-white/80">{subtitle}</p>
+						</div>
+						<div class="shrink-0 text-center">
+							<span class="memo-count block text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">--</span>
+							<span class="block text-xs sm:text-sm text-white/70">留言</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 留言列表 -->
+			<div class="px-6 sm:px-9 pt-2 pb-4">
+				<div id="memo-list" class="space-y-4"
+					data-filter="tags.exists(t,t==&quot;guestbook&quot;)"
+					data-minutes-ago="分钟前" data-hours-ago="小时前"
+					data-days-ago="天前" data-just-now="刚刚"></div>
+			</div>
+
+			<!-- 留言表单 -->
+			<div class="px-6 sm:px-9 pb-6">
+				<div id="guestbook-form" class="card-base p-4 rounded-xl bg-black/[0.02] dark:bg-white/[0.02]">
+					<div class="flex items-center gap-2 mb-3">
+						<input id="gb-nick" type="text" placeholder="昵称（选填）" maxlength="20"
+							class="flex-1 px-3 py-2 text-sm rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 text-black/80 dark:text-white/80 placeholder:text-black/30 dark:placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
+					</div>
+					<textarea id="gb-content" placeholder="说点什么吧..." maxlength="500" rows="3"
+						class="w-full px-3 py-2 text-sm rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-black/20 text-black/80 dark:text-white/80 placeholder:text-black/30 dark:placeholder:text-white/30 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--primary)] mb-3"></textarea>
+					<div class="flex items-center justify-between">
+						<span id="gb-msg" class="text-xs text-black/40 dark:text-white/40"></span>
+						<button id="gb-submit"
+							class="px-5 py-2 text-sm font-medium text-white bg-gradient-to-r from-pink-400 to-rose-500 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50">
+							留下脚印 🐾
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script is:inline>
+		memosClient.init({ container: "memo-list", mode: "moment" });
+	</script>
+</MainGridLayout>

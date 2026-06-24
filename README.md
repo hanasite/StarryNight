@@ -62,6 +62,7 @@ Content is automatically categorized by Memos tags — no manual sorting needed:
 | `/todo/` | 待办清单 (Todo) | `#todo` |
 | `/gallery/` | 图库 (Gallery) | `#gallery` |
 | `/timeline/` | 时间历程 (Timeline) | Static + `#milestone` |
+| `/guestbook/` | 留言板 (Guestbook) | Memos `#guestbook` |
 | `/about/` | 关于我 (About) | Static |
 
 ## ✨ Features

@@ -382,6 +382,7 @@ export type WidgetComponentType =
 	| "site-stats" // 站点统计组件
 	| "calendar"
 	| "nixie-clock"
+	| "guestbook-link"
 	| "custom";
 
 export interface WidgetComponentConfig {

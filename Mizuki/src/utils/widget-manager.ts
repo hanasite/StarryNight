@@ -22,6 +22,7 @@ export const WIDGET_COMPONENT_MAP = {
 	"site-stats": "../components/widgets/site-stats/SiteStats.astro",
 		"nixie-clock": "../components/widgets/nixie-clock/NixieClock.astro",
 	calendar: "../components/widgets/calendar/Calendar.astro",
+		"guestbook-link": "../components/widgets/guestbook-link/GuestbookLink.astro",
 	custom: null,
 } as const;
 
