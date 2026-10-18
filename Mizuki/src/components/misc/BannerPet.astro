@@ -87,6 +87,13 @@
 		display: block;
 	}
 
+	/* Desktop banner mode shifts #main-grid down by the banner extension. */
+	@media (min-width: 1280px) {
+		body.enable-banner:not(.fullscreen-banner) .clawd-pet-layer {
+			transform: translateY(var(--banner-height-extend, 30vh));
+		}
+	}
+
 	@media (max-width: 1279px) {
 		body:has(#banner-wrapper.mobile-hide-banner) .clawd-pet-layer {
 			display: none;
