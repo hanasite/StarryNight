@@ -14,6 +14,7 @@ export const PET_PROFILES = {
 		groundOffsets: ROW_GROUND_OFFSET,
 		runCenters: RUN_FRAME_CENTERS,
 		reactions: REACTIONS,
+		entryLines: ["我回来啦！", "久等了～", "闪亮登场！"],
 	},
 	deepseek: {
 		id: "deepseek",
@@ -45,5 +46,6 @@ export const PET_PROFILES = {
 				lines: ["看看今天的菜单", "碗里还有吗？", "嗯，是白饭的味道"],
 			},
 		],
+		entryLines: ["干饭时间到！", "我回来了，白饭呢？", "登场！"],
 	},
 };

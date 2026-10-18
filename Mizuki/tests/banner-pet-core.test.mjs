@@ -84,6 +84,11 @@ describe("sprite row metadata", () => {
 		assert.equal(frameCenterOffset(1, 0, PET_PROFILES.deepseek), 0);
 		assert.equal(frameCenterOffset(1, 7, PET_PROFILES.deepseek), 0);
 	});
+
+	it("has entry lines for both pets", () => {
+		assert.ok(PET_PROFILES.clawd.entryLines.length > 0);
+		assert.ok(PET_PROFILES.deepseek.entryLines.length > 0);
+	});
 });
 
 describe("pickIndex", () => {

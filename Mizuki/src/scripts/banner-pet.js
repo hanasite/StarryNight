@@ -69,6 +69,7 @@ function initBannerPet(layer, profile) {
 		lastReaction: -1,
 		lastReactAt: 0,
 		bubbleTimer: 0,
+		entryTimer: 0,
 		dragging: false,
 		dragged: false,
 		dragStartX: 0,
@@ -363,6 +364,46 @@ function initBannerPet(layer, profile) {
 		return true;
 	}
 
+	function isBannerMode() {
+		const body = document.body;
+		return (
+			body.classList.contains("enable-banner") &&
+			!body.classList.contains("fullscreen-banner")
+		);
+	}
+
+	function enterFromModeSwitch() {
+		clearTimeout(state.entryTimer);
+		layer.classList.add("is-waiting");
+		state.mode = "waiting";
+		state.behaviorAt = Number.POSITIVE_INFINITY;
+		state.tween = null;
+		state.entryTimer = window.setTimeout(() => {
+			state.entryTimer = 0;
+			layer.classList.remove("is-waiting");
+			if (!isBannerVisible()) {
+				state.mode = "idle";
+				return;
+			}
+			remeasure();
+			if (state.userHidden) {
+				placeBookmark();
+				return;
+			}
+			layer.classList.remove("is-hidden");
+			root.classList.remove("is-user-hidden");
+			root.style.opacity = "1";
+			setX(clampX(state.x, layerWidth(), petWidth()), 1);
+			const lines = profile.entryLines || [];
+			if (lines.length) {
+				showBubble(lines[Math.floor(Math.random() * lines.length)]);
+			}
+			state.mode = "react";
+			state.behaviorAt = Number.POSITIVE_INFINITY;
+			setAnim("wave", (endTime) => idleAt(endTime));
+		}, 1000);
+	}
+
 	function updateBehavior(time) {
 		if (
 			state.mode !== "idle" ||
@@ -570,7 +611,15 @@ function initBannerPet(layer, profile) {
 		requestAnimationFrame(remeasure);
 	});
 	// Wallpaper mode switches only change body classes; remeasure after them.
-	new MutationObserver(remeasure).observe(document.body, {
+	let lastBannerMode = isBannerMode();
+	new MutationObserver(() => {
+		remeasure();
+		const nowBanner = isBannerMode();
+		if (nowBanner && !lastBannerMode) {
+			enterFromModeSwitch();
+		}
+		lastBannerMode = nowBanner;
+	}).observe(document.body, {
 		attributes: true,
 		attributeFilter: ["class"],
 	});

@@ -331,6 +331,14 @@ const layerStyle = `--pet-scale-desktop:${profile.scale.desktop};--pet-scale-mob
 		pointer-events: none !important;
 	}
 
+	/* Wait out the wallpaper transition before showing the pet again. */
+	.banner-pet-layer.is-waiting .banner-pet-root,
+	.banner-pet-layer.is-waiting .banner-pet-bookmark {
+		opacity: 0 !important;
+		visibility: hidden !important;
+		pointer-events: none !important;
+	}
+
 	@media (max-width: 767px) {
 		.banner-pet-layer {
 			--pet-scale-current: var(--pet-scale-mobile, 0.45);
