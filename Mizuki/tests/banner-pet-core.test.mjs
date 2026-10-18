@@ -2,12 +2,15 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
+	PET_CENTER_X,
 	PET_ROWS,
+	RUN_FRAME_CENTERS,
 	bookmarkX,
 	clamp,
 	clampX,
 	directionForMove,
 	easeOutCubic,
+	frameCenterOffset,
 	frameCountForRow,
 	groundOffsetForRow,
 	pickIndex,
@@ -54,6 +57,23 @@ describe("sprite row metadata", () => {
 		assert.equal(groundOffsetForRow(0), 42);
 		assert.equal(groundOffsetForRow(1), 50);
 		assert.equal(groundOffsetForRow(7), 9);
+	});
+
+	it("compensates the run cycle drift", () => {
+		assert.equal(frameCenterOffset(1, 0), 6.5);
+		assert.equal(frameCenterOffset(1, 7), -6.5);
+		assert.equal(frameCenterOffset(2, 0), -6.5);
+		assert.equal(frameCenterOffset(2, 7), 6.5);
+		assert.equal(frameCenterOffset(0, 0), 0);
+		assert.equal(frameCenterOffset(7, 3), 0);
+	});
+
+	it("keeps every run frame on the same visual axis", () => {
+		for (const row of [1, 2]) {
+			RUN_FRAME_CENTERS[row].forEach((center, frame) => {
+				assert.equal(center + frameCenterOffset(row, frame), PET_CENTER_X);
+			});
+		}
 	});
 });
 

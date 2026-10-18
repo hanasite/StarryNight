@@ -5,6 +5,23 @@
 
 export const PET_FRAME_W = 192;
 export const PET_FRAME_H = 208;
+export const PET_CENTER_X = PET_FRAME_W / 2;
+
+// The run rows drift ~13px across the cycle, then snap back to the first frame.
+// This per-frame offset keeps the body centered so the loop does not read as
+// a backward step while the root translates.
+export const RUN_FRAME_CENTERS = {
+	1: [89.5, 90.5, 92, 92.5, 94.5, 96.5, 99.5, 102.5],
+	2: [102.5, 101.5, 100, 99.5, 97.5, 95.5, 92.5, 89.5],
+};
+
+export function frameCenterOffset(row, frame) {
+	const centers = RUN_FRAME_CENTERS[row];
+	if (!centers || !centers.length) {
+		return 0;
+	}
+	return PET_CENTER_X - centers[frame % centers.length];
+}
 
 export const PET_ROWS = {
 	idle: { row: 0, frames: 6, duration: 1100, loop: true },

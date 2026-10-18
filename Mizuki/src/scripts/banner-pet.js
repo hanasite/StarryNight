@@ -8,6 +8,7 @@ import {
 	clampX,
 	directionForMove,
 	easeOutCubic,
+	frameCenterOffset,
 	groundOffsetForRow,
 	pickIndex,
 } from "./banner-pet-core.js";
@@ -90,7 +91,8 @@ function initBannerPet() {
 		if (!spec) {
 			return;
 		}
-		sprite.style.backgroundPosition = `${-state.frame * PET_FRAME_W}px ${-spec.row * PET_FRAME_H}px`;
+		const offset = frameCenterOffset(spec.row, state.frame);
+		sprite.style.backgroundPosition = `${-state.frame * PET_FRAME_W + offset}px ${-spec.row * PET_FRAME_H}px`;
 	}
 
 	function setAnim(name, onEnd = null) {
