@@ -19,7 +19,7 @@ export const PET_PROFILES = {
 		id: "deepseek",
 		name: "deepseek酱",
 		sprite: "/assets/pets/deepseek/spritesheet.webp",
-		scale: { desktop: 0.5, mobile: 0.4 },
+		scale: { desktop: 0.6, mobile: 0.48 },
 		defaultX: 0.65,
 		groundOffsets: {
 			0: 7,
