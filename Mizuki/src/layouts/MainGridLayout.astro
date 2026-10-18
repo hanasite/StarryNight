@@ -3,6 +3,7 @@ import FloatingControls from "@components/control/FloatingControls.astro";
 import { SidebarTOC } from "@components/features/toc";
 import Banner from "@components/layout/Banner.astro";
 import RightSideBar from "@components/layout/RightSideBar.astro";
+import BannerPet from "@components/misc/BannerPet.astro";
 import FullscreenWallpaper from "@components/misc/FullscreenWallpaper.astro";
 import IconifyLoader from "@components/misc/IconifyLoader.astro";
 import Footer from "@components/organisms/footer/Footer.astro";
@@ -163,6 +164,7 @@ const defaultPostListLayout = siteConfig.postListLayout?.defaultMode || "list";
 	>
 		<!-- The pointer-events-none here prevent blocking the click event of the TOC -->
 		<div class="relative max-w-(--page-width) mx-auto pointer-events-auto">
+			<BannerPet />
 			<div
 				id="main-grid"
 				class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-none md:grid-rows-[auto] mx-auto gap-4 px-2 md:px-4 ${!mobileShowSidebar || !hasMobileDrawerComponents ? "mobile-no-sidebar" : ""} ${hasRightSidebarComponents ? "mobile-both-sidebar" : ""}`}
