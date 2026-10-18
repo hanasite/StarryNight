@@ -13,7 +13,10 @@ import { initPostIdMap } from "../utils/permalink-utils";
 const showCategoryBar = siteConfig.postListLayout.categoryBar?.enable ?? false;
 
 export const getStaticPaths = (async ({ paginate }) => {
-	const allBlogPosts = await getSortedPosts();
+	// 归档文章（category=归档）只进 /archive 与其详情页，不占首页列表
+	const allBlogPosts = (await getSortedPosts()).filter(
+		(post) => post.data.category !== "归档",
+	);
 	// 初始化文章 ID 映射（用于 permalink 功能）
 	initPostIdMap(allBlogPosts);
 	return paginate(allBlogPosts, { pageSize: PAGE_SIZE });

@@ -99,6 +99,25 @@ draft: false
 文章正文（Markdown）
 ```
 
+### 博客归档（超过一个月的文章转静态）
+
+Memos 里的 `#blog` 文章默认全部动态渲染。归档旧文的流程：
+
+```bash
+cd Mizuki
+node scripts/archive-blog.mjs --dry-run   # 预览要归档的文章
+node scripts/archive-blog.mjs             # 归档 30 天前的 #blog 文章
+pnpm exec astro build
+```
+
+脚本会把文章导出到 `src/content/posts/`（`category: 归档`），并自动更新
+`src/pages/blog.astro` 的 `data-since`——动态 `/blog` 页只显示截止时间之后的
+文章，归档文章在 `/archive/` 归档页和 `/posts/<slug>/` 详情页。首页列表会排除
+`category: 归档` 的文章。重复运行会跳过已归档的文章（按文末 `memos-id` 标记）。
+
+> 导出的个人博文已被 `.gitignore` 忽略，只留在本地用于构建，不会进入公开仓库。
+> 新机器上克隆仓库后，先运行一次归档脚本再构建。
+
 ### Banner 轮播
 
 - 静态图片：修改 `siteConfig.ts` 的 `banner.src`

@@ -7,8 +7,51 @@
 	const DEFAULT_API = "/api/v1/memos";    // POST list
 	const API_PREFIX = "/api/v1/";           // DELETE/PATCH (memoId 含 memos/)
 
+	// 长内容折叠样式（注入一次，全站生效）
+	(function () {
+		const style = document.createElement("style");
+		style.textContent = [
+			".memo-content{position:relative}",
+			".memo-content img{max-width:100%;max-height:min(60vh,480px);width:auto;height:auto;display:block;margin:.75rem auto;border-radius:.5rem}",
+			".memo-content.collapsed{max-height:24rem;overflow:hidden}",
+			".memo-content.collapsed::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4.5rem;pointer-events:none;background:linear-gradient(to top,var(--card-bg,#fff),transparent)}",
+			".memo-expand-btn{display:block;margin:.6rem auto 0;padding:.25rem 1.25rem;font-size:.8rem;line-height:1.6;border-radius:9999px;border:1px solid var(--primary);color:var(--primary);background:transparent;cursor:pointer;transition:opacity .2s}",
+			".memo-expand-btn:hover{opacity:.7}",
+		].join("\n");
+		document.head.appendChild(style);
+	})();
+
 	// 检查编辑权限
 	function hasPerm() { return document.cookie.indexOf("memos_key=") !== -1; }
+
+	/* 长内容折叠：内容超过 384px 默认收起，点按钮展开/收起
+	 * 检测用固定阈值（未加 collapsed 类时 clientHeight == scrollHeight，不能用两者比较）
+	 * 图片懒加载会低估高度——图片 load 后重查（见 init 的捕获监听） */
+	var COLLAPSE_LIMIT = 384;  // 与 CSS .memo-content.collapsed 的 max-height 一致
+	function setupCollapse(root) {
+		root.querySelectorAll(".memo-content").forEach(function (el) {
+			if (el.dataset.userExpanded) return;             // 用户手动展开过：不再自动折叠
+			if (el.scrollHeight <= COLLAPSE_LIMIT) return;   // 内容不超阈值不折叠
+			if (!el.dataset.btnSet) {                        // 首次折叠时创建按钮
+				el.dataset.btnSet = "1";
+				var btn = document.createElement("button");
+				btn.type = "button";
+				btn.className = "memo-expand-btn";
+				btn.textContent = "展开全文";
+				btn.setAttribute("aria-expanded", "false");
+				btn.onclick = function (e) {
+					e.stopPropagation();
+					var expanded = !el.classList.contains("collapsed");
+					el.classList.toggle("collapsed", expanded);
+					if (!expanded) el.dataset.userExpanded = "1";
+					btn.textContent = expanded ? "展开全文" : "收起";
+					btn.setAttribute("aria-expanded", String(!expanded));
+				};
+				el.after(btn);
+			}
+			el.classList.add("collapsed");
+		});
+	}
 
 	function renderMD(text) {
 		var html;
@@ -21,6 +64,8 @@
 		html = html.replace(/src="(\/file\/[^"]+)"/g, function (match, url) {
 			return 'src="' + url.replace(/ /g, "%20").replace(/[^\x00-\x7F]/g, function (c) { return encodeURIComponent(c); }) + '"';
 		});
+		// 内容图片统一约束（prose 的 img 规则没有 max-width，原图会撑爆容器）+ 懒加载
+		html = html.replace(/<img /g, '<img loading="lazy" class="max-w-full h-auto rounded-lg" ');
 		return html;
 	}
 
@@ -47,6 +92,14 @@
 			if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
 			return new Date(b.date) - new Date(a.date);
 		});
+	}
+
+	// 归档过滤：blog 页只显示 since（ISO 时间）之后的 memo，更早的已归档为静态文章
+	function filterBySince(moments, since) {
+		if (!since) return moments;
+		var t = new Date(since).getTime();
+		if (isNaN(t)) return moments;
+		return moments.filter(function (m) { return new Date(m.date).getTime() >= t; });
 	}
 
 	function renderMomentCard(moment, labels) {
@@ -139,6 +192,7 @@
 		const filter = opts.filter || container.dataset.filter || "";
 		const labels = { justNow: container.dataset.justNow || "just now", minutes: container.dataset.minutesAgo || "min ago", hours: container.dataset.hoursAgo || "h ago", days: container.dataset.daysAgo || "d ago" };
 		const mode = opts.mode || "moment";
+		const since = opts.since || container.dataset.since || "";
 
 		function fetchAndRender() {
 			var f = filter;
@@ -147,11 +201,12 @@
 			var url = apiUrl + (f ? ((apiUrl.indexOf("?") === -1 ? "?" : "&") + "filter=" + encodeURIComponent(f)) : "");
 			if (url.indexOf("pageSize") === -1) url += (url.indexOf("?") === -1 ? "?" : "&") + "pageSize=50";
 			fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); }).then(function (data) {
-				var moments = transformMemos(data, baseUrl);
+				var moments = filterBySince(transformMemos(data, baseUrl), since);
 				if (!moments.length) return;
 				container.innerHTML = moments.map(function (m) { return mode === "todo" ? renderTodoCard(m) : renderMomentCard(m, labels); }).join("");
 				var countEl = container.parentElement.querySelector(".memo-count");
 				if (countEl) countEl.textContent = String(moments.length);
+				setupCollapse(container);   // 长内容折叠（blog 长文）
 				enableTodoCheckboxes(container, apiToken);
 				// 删除按钮
 				if (!hasPerm()) { container.querySelectorAll(".memo-delete-btn, .memo-edit-btn").forEach(function (b) { b.style.display = "none"; }); }
@@ -173,6 +228,8 @@
 		container.__memosRefresh = fetchAndRender;
 		fetchAndRender();
 		document.addEventListener("swup:contentReplaced", fetchAndRender);
+		// 图片懒加载会低估内容高度——任意图片加载完成后重查折叠（img load 不冒泡，用捕获）
+		container.addEventListener("load", function () { setupCollapse(container); }, true);
 	}
 
 	// ─── 标签云 ──────────────────────────────────────────────
@@ -183,7 +240,8 @@
 		var url = (apiUrl || DEFAULT_API) + "?pageSize=200";
 		if (filter) url += "&filter=" + encodeURIComponent(filter);
 		fetch(url).then(function (res) { return res.ok ? res.json() : Promise.reject(); }).then(function (data) {
-			var moments = transformMemos(data, "");
+			var listEl = document.getElementById("memo-list");
+			var moments = filterBySince(transformMemos(data, ""), listEl ? listEl.dataset.since : "");
 			var counts = {};
 			var exclude = ["ticker", "blog", "todo", "milestone"];
 			moments.forEach(function (m) {
