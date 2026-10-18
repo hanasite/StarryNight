@@ -3,6 +3,7 @@ import {
 	PET_FRAME_W,
 	PET_ROWS,
 	REACTIONS,
+	bookmarkX,
 	clamp,
 	clampX,
 	directionForMove,
@@ -39,8 +40,8 @@ function initBannerPet() {
 	const sprite = document.getElementById("clawd-pet-sprite");
 	const bubble = document.getElementById("clawd-pet-bubble");
 	const hideBtn = document.getElementById("clawd-pet-hide");
-	const handle = document.getElementById("clawd-pet-handle");
-	if (!layer || !root || !sprite || !bubble || !hideBtn || !handle) {
+	const bookmark = document.getElementById("clawd-pet-bookmark");
+	if (!layer || !root || !sprite || !bubble || !hideBtn || !bookmark) {
 		return;
 	}
 	if (layer.dataset.ready === "1") {
@@ -76,11 +77,12 @@ function initBannerPet() {
 
 	const now = () => performance.now();
 	const petWidth = () => root.offsetWidth || PET_FRAME_W * 0.6;
+	const bookmarkWidth = () => bookmark.offsetWidth || 34;
 	const layerWidth = () => layer.clientWidth;
 
-	function setX(x) {
+	function setX(x, scale = 1) {
 		state.x = x;
-		root.style.transform = `translate3d(${x}px, 0, 0)`;
+		root.style.transform = `translate3d(${x}px, 0, 0) scale(${scale})`;
 	}
 
 	function applyFrame() {
@@ -206,9 +208,19 @@ function initBannerPet() {
 		return clampX(fraction * span, layerWidth(), petWidth());
 	}
 
-	function startTween(time, fromX, toX, fromOpacity, toOpacity, duration, onDone) {
+	function startTween(
+		time,
+		fromX,
+		toX,
+		fromOpacity,
+		toOpacity,
+		duration,
+		onDone,
+		fromScale = 1,
+		toScale = 1,
+	) {
 		if (duration <= 0 || reduceMotion.matches) {
-			setX(toX);
+			setX(toX, toScale);
 			root.style.opacity = String(toOpacity);
 			if (onDone) {
 				onDone();
@@ -220,6 +232,8 @@ function initBannerPet() {
 			toX,
 			fromOpacity,
 			toOpacity,
+			fromScale,
+			toScale,
 			start: time,
 			duration,
 			onDone,
@@ -233,7 +247,9 @@ function initBannerPet() {
 		}
 		const k = Math.min(1, (time - tween.start) / tween.duration);
 		const eased = easeOutCubic(k);
-		setX(tween.fromX + (tween.toX - tween.fromX) * eased);
+		const scale =
+			tween.fromScale + (tween.toScale - tween.fromScale) * eased;
+		setX(tween.fromX + (tween.toX - tween.fromX) * eased, scale);
 		root.style.opacity = String(
 			tween.fromOpacity + (tween.toOpacity - tween.fromOpacity) * eased,
 		);
@@ -245,6 +261,12 @@ function initBannerPet() {
 		}
 	}
 
+	function placeBookmark() {
+		const width = bookmarkWidth();
+		const x = bookmarkX(state.savedX, petWidth(), width, layerWidth());
+		bookmark.style.setProperty("--clawd-bookmark-x", `${x}px`);
+	}
+
 	function hidePet(time) {
 		if (state.userHidden || state.dragging) {
 			return;
@@ -253,12 +275,24 @@ function initBannerPet() {
 		state.mode = "hidden";
 		state.savedX = state.x;
 		state.behaviorAt = Number.POSITIVE_INFINITY;
+		bubble.classList.remove("is-visible");
+		clearTimeout(state.bubbleTimer);
 		safeSet(HIDDEN_KEY, "1");
-		const targetX = layerWidth() + petWidth();
-		startTween(time, state.x, targetX, 1, 0, reduceMotion.matches ? 0 : 320, () => {
-			root.classList.add("is-user-hidden");
-			layer.classList.add("is-hidden");
-		});
+		startTween(
+			time,
+			state.x,
+			state.x,
+			1,
+			0,
+			reduceMotion.matches ? 0 : 280,
+			() => {
+				root.classList.add("is-user-hidden");
+				placeBookmark();
+				layer.classList.add("is-hidden");
+			},
+			1,
+			0.2,
+		);
 	}
 
 	function showPet(time) {
@@ -269,13 +303,22 @@ function initBannerPet() {
 		safeSet(HIDDEN_KEY, "0");
 		root.classList.remove("is-user-hidden");
 		layer.classList.remove("is-hidden");
-		const fromX = layerWidth() + petWidth();
 		const toX = clampX(state.savedX, layerWidth(), petWidth());
-		setX(fromX);
+		setX(toX, 0.2);
 		root.style.opacity = "0";
-		startTween(time, fromX, toX, 0, 1, reduceMotion.matches ? 0 : 320, () => {
-			idleAt(time);
-		});
+		startTween(
+			time,
+			toX,
+			toX,
+			0,
+			1,
+			reduceMotion.matches ? 0 : 280,
+			() => {
+				idleAt(time);
+			},
+			0.2,
+			1,
+		);
 	}
 
 	function isBannerVisible() {
@@ -338,6 +381,10 @@ function initBannerPet() {
 
 	function remeasure() {
 		if (!layerWidth()) {
+			return;
+		}
+		if (state.userHidden) {
+			placeBookmark();
 			return;
 		}
 		setX(clampX(state.x, layerWidth(), petWidth()));
@@ -413,7 +460,7 @@ function initBannerPet() {
 		event.stopPropagation();
 		hidePet(now());
 	});
-	handle.addEventListener("click", (event) => {
+	bookmark.addEventListener("click", (event) => {
 		event.stopPropagation();
 		showPet(now());
 	});
@@ -441,9 +488,10 @@ function initBannerPet() {
 	if (hidden) {
 		state.userHidden = true;
 		state.mode = "hidden";
-		setX(layerWidth() + petWidth());
+		state.savedX = startX;
 		root.style.opacity = "0";
 		root.classList.add("is-user-hidden");
+		placeBookmark();
 		layer.classList.add("is-hidden");
 		setAnim("idle");
 	} else {

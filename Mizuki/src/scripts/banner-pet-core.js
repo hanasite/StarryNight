@@ -60,6 +60,16 @@ export function clampX(x, layerWidth, petWidth, margin = 8) {
 	return clamp(x, min, max);
 }
 
+// Center a small bookmark on the pet's visible center, inside the content width.
+export function bookmarkX(petX, petWidth, bookmarkWidth, layerWidth, margin = 8) {
+	return clampX(
+		petX + petWidth / 2 - bookmarkWidth / 2,
+		layerWidth,
+		bookmarkWidth,
+		margin,
+	);
+}
+
 export function groundOffsetForRow(row) {
 	return ROW_GROUND_OFFSET[row] ?? 0;
 }

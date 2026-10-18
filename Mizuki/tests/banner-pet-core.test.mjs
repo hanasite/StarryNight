@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import {
 	PET_ROWS,
+	bookmarkX,
 	clamp,
 	clampX,
 	directionForMove,
@@ -27,6 +28,11 @@ describe("clamp / clampX", () => {
 
 	it("centers when the content is narrower than the pet", () => {
 		assert.equal(clampX(50, 80, 100), 0);
+	});
+
+	it("centers the bookmark on the pet", () => {
+		assert.equal(bookmarkX(100, 100, 34, 1000), 133);
+		assert.equal(bookmarkX(980, 100, 34, 1000), 958);
 	});
 });
 
