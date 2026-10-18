@@ -1209,3 +1209,5 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 - 2026-10-19：隐藏方式从「右侧半头把手」改为「在宠物当前位置收成书签」（手机端侧边把手存在布局问题）。
   `banner-pet-core.js` 新增 `bookmarkX()`；控制器隐藏/恢复改为原地缩放淡出/淡入，不再向右侧滑动。
+- 2026-10-19：扩展为多宠物。新增 `banner-pet-profiles.js`（Clawd / deepseek酱），
+  两只宠物共用分界线、独立走动/隐藏书签；书签可水平拖拽；DeepSeek 图层 z-index 更高。

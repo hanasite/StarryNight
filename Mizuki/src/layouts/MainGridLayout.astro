@@ -164,7 +164,8 @@ const defaultPostListLayout = siteConfig.postListLayout?.defaultMode || "list";
 	>
 		<!-- The pointer-events-none here prevent blocking the click event of the TOC -->
 		<div class="relative max-w-(--page-width) mx-auto pointer-events-auto">
-			<BannerPet />
+			<BannerPet pet="clawd" />
+			<BannerPet pet="deepseek" />
 			<div
 				id="main-grid"
 				class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-none md:grid-rows-[auto] mx-auto gap-4 px-2 md:px-4 ${!mobileShowSidebar || !hasMobileDrawerComponents ? "mobile-no-sidebar" : ""} ${hasRightSidebarComponents ? "mobile-both-sidebar" : ""}`}

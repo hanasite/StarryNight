@@ -1,19 +1,26 @@
 ---
-// Banner pet (Clawd). Visible only in banner wallpaper mode.
-// The controller lives in src/scripts/banner-pet.js.
+import { PET_PROFILES } from "../../scripts/banner-pet-profiles.js";
+
+interface Props {
+	pet?: keyof typeof PET_PROFILES;
+}
+
+const { pet = "clawd" } = Astro.props;
+const profile = PET_PROFILES[pet] ?? PET_PROFILES.clawd;
+const layerStyle = `--pet-scale-desktop:${profile.scale.desktop};--pet-scale-mobile:${profile.scale.mobile};`;
 ---
 <div
-	id="clawd-pet"
-	class="clawd-pet-layer"
-	data-sprite="/assets/pets/clawd/spritesheet.webp"
+	class="banner-pet-layer"
+	data-banner-pet
+	data-pet={profile.id}
+	style={layerStyle}
 >
-	<div id="clawd-pet-root" class="clawd-pet-root">
+	<div class="banner-pet-root">
 		<button
-			id="clawd-pet-hide"
-			class="clawd-pet-hide"
+			class="banner-pet-hide"
 			type="button"
-			aria-label="隐藏 Clawd"
-			title="隐藏 Clawd"
+			aria-label={`隐藏 ${profile.name}`}
+			title={`隐藏 ${profile.name}`}
 		>
 			<svg
 				viewBox="0 0 24 24"
@@ -29,42 +36,61 @@
 				<path d="M9 6l6 6-6 6"></path>
 			</svg>
 		</button>
-		<div id="clawd-pet-scale" class="clawd-pet-scale">
+		<div class="banner-pet-scale">
 			<div
-				id="clawd-pet-sprite"
-				class="clawd-pet-sprite"
+				class="banner-pet-sprite"
 				role="button"
 				tabindex="0"
-				aria-label="和 Clawd 互动"
+				aria-label={`和 ${profile.name} 互动`}
+				style={`background-image:url("${profile.sprite}")`}
 			></div>
 		</div>
 		<div
-			id="clawd-pet-bubble"
-			class="clawd-pet-bubble"
+			class="banner-pet-bubble"
 			role="status"
 			aria-live="polite"
 		></div>
 	</div>
 	<button
-		id="clawd-pet-bookmark"
-		class="clawd-pet-bookmark"
+		class="banner-pet-bookmark"
 		type="button"
-		aria-label="显示 Clawd"
-		title="显示 Clawd"
+		aria-label={`显示 ${profile.name}（可拖动）`}
+		title={`显示 ${profile.name}（可拖动）`}
 	>
-		<span class="clawd-pet-bookmark-face" aria-hidden="true">
-			<svg viewBox="0 0 18 10" focusable="false">
-				<rect x="2" y="0" width="4" height="9" rx="1"></rect>
-				<rect x="12" y="0" width="4" height="9" rx="1"></rect>
-			</svg>
+		<span class="banner-pet-bookmark-face" aria-hidden="true">
+			{
+				profile.id === "deepseek" ? (
+					<svg viewBox="0 0 18 10" focusable="false">
+						<path
+							d="M2 5h14c0 3.2-2.2 5-7 5S2 8.2 2 5Z"
+							fill="#f7fbff"
+						/>
+						<path
+							d="M5 3.4c1.2-1.5 2.5-2.2 4-2.2s2.8.7 4 2.2"
+							fill="none"
+							stroke="#f7fbff"
+							stroke-width="1.6"
+							stroke-linecap="round"
+						/>
+					</svg>
+				) : (
+					<svg viewBox="0 0 18 10" focusable="false">
+						<rect x="2" y="0" width="4" height="9" rx="1" />
+						<rect x="12" y="0" width="4" height="9" rx="1" />
+					</svg>
+				)
+			}
 		</span>
 	</button>
 </div>
 
-<script is:inline>
+<script is:inline define:vars={{ petId: profile.id }}>
 	try {
-		if (localStorage.getItem("clawdPetHidden") === "1") {
-			document.documentElement.classList.add("clawd-pet-hidden-early");
+		if (localStorage.getItem(petId + "PetHidden") === "1") {
+			const layer = document.querySelector(
+				'.banner-pet-layer[data-pet="' + petId + '"]',
+			);
+			if (layer) layer.classList.add("is-early-hidden");
 		}
 	} catch (e) {}
 </script>
@@ -73,8 +99,8 @@
 </script>
 
 <style>
-	.clawd-pet-layer {
-		--clawd-scale: 0.6;
+	.banner-pet-layer {
+		--pet-scale-current: var(--pet-scale-desktop, 0.6);
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -85,52 +111,55 @@
 		display: none;
 	}
 
-	body.enable-banner:not(.fullscreen-banner) .clawd-pet-layer {
+	.banner-pet-layer[data-pet="deepseek"] {
+		z-index: 41;
+	}
+
+	body.enable-banner:not(.fullscreen-banner) .banner-pet-layer {
 		display: block;
 	}
 
 	/* Desktop banner mode shifts #main-grid down by the banner extension. */
 	@media (min-width: 1280px) {
-		body.enable-banner:not(.fullscreen-banner) .clawd-pet-layer {
+		body.enable-banner:not(.fullscreen-banner) .banner-pet-layer {
 			transform: translateY(var(--banner-height-extend, 30vh));
 		}
 	}
 
 	@media (max-width: 1279px) {
-		body:has(#banner-wrapper.mobile-hide-banner) .clawd-pet-layer {
+		body:has(#banner-wrapper.mobile-hide-banner) .banner-pet-layer {
 			display: none;
 		}
 	}
 
-	.clawd-pet-root {
+	.banner-pet-root {
 		position: absolute;
 		left: 0;
 		bottom: 0;
-		width: calc(192px * var(--clawd-scale));
-		height: calc(208px * var(--clawd-scale));
+		width: calc(192px * var(--pet-scale-current));
+		height: calc(208px * var(--pet-scale-current));
 		opacity: 1;
 		transform-origin: 50% 100%;
 		will-change: transform, opacity;
 	}
 
-	.clawd-pet-scale {
+	.banner-pet-scale {
 		position: absolute;
 		left: 0;
 		bottom: 0;
 		width: 192px;
 		height: 208px;
-		transform: scale(var(--clawd-scale));
+		transform: scale(var(--pet-scale-current));
 		transform-origin: bottom left;
 	}
 
-	.clawd-pet-sprite {
+	.banner-pet-sprite {
 		position: absolute;
 		inset: 0;
-		background-image: url("/assets/pets/clawd/spritesheet.webp");
 		background-repeat: no-repeat;
 		background-size: 1536px 1872px;
 		image-rendering: pixelated;
-		transform: translateY(var(--clawd-ground, 0px));
+		transform: translateY(var(--pet-ground, 0px));
 		cursor: grab;
 		pointer-events: auto;
 		touch-action: pan-y;
@@ -138,11 +167,11 @@
 		-webkit-user-select: none;
 	}
 
-	.clawd-pet-sprite.is-dragging {
+	.banner-pet-sprite.is-dragging {
 		cursor: grabbing;
 	}
 
-	.clawd-pet-bubble {
+	.banner-pet-bubble {
 		position: absolute;
 		left: 50%;
 		bottom: calc(100% + 6px);
@@ -165,12 +194,12 @@
 		z-index: 3;
 	}
 
-	.clawd-pet-bubble.is-visible {
+	.banner-pet-bubble.is-visible {
 		opacity: 1;
 		transform: translate(-50%, 0);
 	}
 
-	.clawd-pet-bubble::after {
+	.banner-pet-bubble::after {
 		content: "";
 		position: absolute;
 		left: 50%;
@@ -183,11 +212,11 @@
 		transform: translateX(-50%) rotate(45deg) translateY(-4px);
 	}
 
-	:root.dark .clawd-pet-bubble {
+	:root.dark .banner-pet-bubble {
 		color: oklch(0.92 0.01 var(--hue));
 	}
 
-	.clawd-pet-hide {
+	.banner-pet-hide {
 		position: absolute;
 		right: -10px;
 		top: 18%;
@@ -211,22 +240,22 @@
 		cursor: pointer;
 	}
 
-	.clawd-pet-root:hover .clawd-pet-hide,
-	.clawd-pet-hide:focus-visible {
+	.banner-pet-root:hover .banner-pet-hide,
+	.banner-pet-hide:focus-visible {
 		opacity: 0.95;
 		pointer-events: auto;
 		transform: scale(1);
 	}
 
 	@media (hover: none) {
-		.clawd-pet-hide {
+		.banner-pet-hide {
 			opacity: 0.7;
 			pointer-events: auto;
 			transform: scale(1);
 		}
 	}
 
-	.clawd-pet-bookmark {
+	.banner-pet-bookmark {
 		position: absolute;
 		left: 0;
 		bottom: 0;
@@ -240,77 +269,89 @@
 		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
 		opacity: 0;
 		pointer-events: none;
-		transform: translateX(var(--clawd-bookmark-x, 0px)) scale(0.7);
+		transform: translateX(var(--pet-bookmark-x, 0px)) scale(0.7);
 		transform-origin: bottom center;
 		transition:
 			opacity 0.18s ease,
 			transform 0.18s ease;
 		z-index: 6;
-		cursor: pointer;
+		cursor: grab;
+		touch-action: pan-y;
 		display: flex;
 		align-items: flex-start;
 		justify-content: center;
 	}
 
-	.clawd-pet-layer.is-hidden .clawd-pet-bookmark {
-		opacity: 1;
-		pointer-events: auto;
-		transform: translateX(var(--clawd-bookmark-x, 0px)) scale(1);
+	.banner-pet-layer[data-pet="deepseek"] .banner-pet-bookmark {
+		background: linear-gradient(180deg, #8fb4ff 0%, #4d6fd6 100%);
 	}
 
-	.clawd-pet-bookmark:hover {
+	.banner-pet-layer.is-hidden .banner-pet-bookmark {
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateX(var(--pet-bookmark-x, 0px)) scale(1);
+	}
+
+	.banner-pet-bookmark:hover {
 		filter: brightness(1.06);
 	}
 
-	.clawd-pet-bookmark-face {
+	.banner-pet-bookmark.is-dragging {
+		cursor: grabbing;
+		filter: brightness(1.06);
+		transition: none;
+	}
+
+	.banner-pet-bookmark-face {
 		display: block;
 		width: 18px;
 		height: 10px;
+		pointer-events: none;
 	}
 
-	.clawd-pet-bookmark-face svg {
+	.banner-pet-bookmark-face svg {
 		display: block;
 		width: 100%;
 		height: 100%;
 	}
 
-	.clawd-pet-bookmark-face rect {
+	.banner-pet-bookmark-face rect {
 		fill: #2b211c;
 	}
 
-	.clawd-pet-root.is-user-hidden {
+	.banner-pet-root.is-user-hidden {
 		opacity: 0;
 		visibility: hidden;
 		pointer-events: none;
 	}
 
-	html.clawd-pet-hidden-early .clawd-pet-root {
+	.banner-pet-layer.is-early-hidden .banner-pet-root {
 		opacity: 0 !important;
 		visibility: hidden !important;
 		pointer-events: none !important;
 	}
 
 	@media (max-width: 767px) {
-		.clawd-pet-layer {
-			--clawd-scale: 0.45;
+		.banner-pet-layer {
+			--pet-scale-current: var(--pet-scale-mobile, 0.45);
 		}
 
-		.clawd-pet-bookmark {
+		.banner-pet-bookmark {
 			width: 30px;
 			height: 42px;
 			padding-top: 8px;
 		}
 
-		.clawd-pet-bookmark-face {
+		.banner-pet-bookmark-face {
 			width: 16px;
 			height: 9px;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.clawd-pet-bubble,
-		.clawd-pet-hide,
-		.clawd-pet-bookmark {
+		.banner-pet-bubble,
+		.banner-pet-hide,
+		.banner-pet-bookmark {
 			transition: none;
 		}
 	}

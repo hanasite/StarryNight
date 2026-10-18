@@ -15,8 +15,12 @@ export const RUN_FRAME_CENTERS = {
 	2: [102.5, 101.5, 100, 99.5, 97.5, 95.5, 92.5, 89.5],
 };
 
-export function frameCenterOffset(row, frame) {
-	const centers = RUN_FRAME_CENTERS[row];
+export function frameCenterOffset(row, frame, profile = null) {
+	const centers = profile
+		? profile.runCenters
+			? profile.runCenters[row]
+			: null
+		: RUN_FRAME_CENTERS[row];
 	if (!centers || !centers.length) {
 		return 0;
 	}
@@ -87,8 +91,9 @@ export function bookmarkX(petX, petWidth, bookmarkWidth, layerWidth, margin = 8)
 	);
 }
 
-export function groundOffsetForRow(row) {
-	return ROW_GROUND_OFFSET[row] ?? 0;
+export function groundOffsetForRow(row, profile = null) {
+	const offsets = profile?.groundOffsets ?? ROW_GROUND_OFFSET;
+	return offsets[row] ?? 0;
 }
 
 const frameCounts = new Map(

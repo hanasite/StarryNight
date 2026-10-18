@@ -2,7 +2,6 @@ import {
 	PET_FRAME_H,
 	PET_FRAME_W,
 	PET_ROWS,
-	REACTIONS,
 	bookmarkX,
 	clamp,
 	clampX,
@@ -12,12 +11,13 @@ import {
 	groundOffsetForRow,
 	pickIndex,
 } from "./banner-pet-core.js";
+import { PET_PROFILES } from "./banner-pet-profiles.js";
 
-const HIDDEN_KEY = "clawdPetHidden";
-const X_KEY = "clawdPetX";
 const BUBBLE_MS = 2200;
 const REACT_COOLDOWN_MS = 400;
 const DRAG_THRESHOLD = 4;
+const petInstances =
+	globalThis.__bannerPetInstances ?? (globalThis.__bannerPetInstances = []);
 
 function safeGet(key) {
 	try {
@@ -35,23 +35,23 @@ function safeSet(key, value) {
 	}
 }
 
-function initBannerPet() {
-	const layer = document.getElementById("clawd-pet");
-	const root = document.getElementById("clawd-pet-root");
-	const sprite = document.getElementById("clawd-pet-sprite");
-	const bubble = document.getElementById("clawd-pet-bubble");
-	const hideBtn = document.getElementById("clawd-pet-hide");
-	const bookmark = document.getElementById("clawd-pet-bookmark");
-	if (!layer || !root || !sprite || !bubble || !hideBtn || !bookmark) {
-		return;
-	}
+function initBannerPet(layer, profile) {
 	if (layer.dataset.ready === "1") {
 		return;
 	}
+	const root = layer.querySelector(".banner-pet-root");
+	const sprite = layer.querySelector(".banner-pet-sprite");
+	const bubble = layer.querySelector(".banner-pet-bubble");
+	const hideBtn = layer.querySelector(".banner-pet-hide");
+	const bookmark = layer.querySelector(".banner-pet-bookmark");
+	if (!root || !sprite || !bubble || !hideBtn || !bookmark) {
+		return;
+	}
 	layer.dataset.ready = "1";
+	layer.classList.remove("is-early-hidden");
 
-	document.documentElement.classList.remove("clawd-pet-hidden-early");
-
+	const HIDDEN_KEY = `${profile.id}PetHidden`;
+	const X_KEY = `${profile.id}PetX`;
 	const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 	const state = {
 		x: 0,
@@ -74,6 +74,12 @@ function initBannerPet() {
 		dragStartX: 0,
 		dragStartPetX: 0,
 		pointerId: null,
+		bookmarkDragging: false,
+		bookmarkDragged: false,
+		bookmarkStartX: 0,
+		bookmarkStartSavedX: 0,
+		bookmarkPointerId: null,
+		suppressBookmarkClick: false,
 	};
 
 	const now = () => performance.now();
@@ -91,7 +97,7 @@ function initBannerPet() {
 		if (!spec) {
 			return;
 		}
-		const offset = frameCenterOffset(spec.row, state.frame);
+		const offset = frameCenterOffset(spec.row, state.frame, profile);
 		sprite.style.backgroundPosition = `${-state.frame * PET_FRAME_W + offset}px ${-spec.row * PET_FRAME_H}px`;
 	}
 
@@ -104,7 +110,10 @@ function initBannerPet() {
 		state.frame = 0;
 		state.frameStarted = now();
 		state.onAnimEnd = onEnd;
-		sprite.style.setProperty("--clawd-ground", `${groundOffsetForRow(spec.row)}px`);
+		sprite.style.setProperty(
+			"--pet-ground",
+			`${groundOffsetForRow(spec.row, profile)}px`,
+		);
 		applyFrame();
 	}
 
@@ -155,17 +164,29 @@ function initBannerPet() {
 		}, BUBBLE_MS);
 	}
 
-	function startWalk() {
+	function pickTarget() {
 		const width = layerWidth();
 		const widthPet = petWidth();
 		const min = 8;
 		const max = Math.max(min, width - widthPet - 8);
+		const others = petInstances
+			.filter((instance) => instance.layer !== layer)
+			.map((instance) => instance.center());
 		let target = min + Math.random() * Math.max(0, max - min);
-		if (Math.abs(target - state.x) < 40) {
-			const offset = (Math.random() < 0.5 ? -1 : 1) * (80 + Math.random() * 160);
-			target = clampX(state.x + offset, width, widthPet);
+		for (let attempt = 0; attempt < 5; attempt++) {
+			const candidate = min + Math.random() * Math.max(0, max - min);
+			const center = candidate + widthPet / 2;
+			if (others.every((other) => Math.abs(other - center) > widthPet / 2 + 60)) {
+				target = candidate;
+				break;
+			}
+			target = candidate;
 		}
-		state.targetX = clampX(target, width, widthPet);
+		return clampX(target, width, widthPet);
+	}
+
+	function startWalk() {
+		state.targetX = pickTarget();
 		state.mode = "walk";
 		state.behaviorAt = Number.POSITIVE_INFINITY;
 		setAnim(directionForMove(state.x, state.targetX));
@@ -186,26 +207,29 @@ function initBannerPet() {
 			return;
 		}
 		state.lastReactAt = time;
-		const index = pickIndex(REACTIONS.length, Math.random(), state.lastReaction);
+		const reactions = profile.reactions;
+		const index = pickIndex(reactions.length, Math.random(), state.lastReaction);
 		if (index < 0) {
 			return;
 		}
 		state.lastReaction = index;
-		const reaction = REACTIONS[index];
+		const reaction = reactions[index];
 		state.mode = "react";
 		state.behaviorAt = Number.POSITIVE_INFINITY;
 		setAnim(reaction.row, (endTime) => idleAt(endTime));
 		showBubble(reaction.lines[Math.floor(Math.random() * reaction.lines.length)]);
 	}
 
-	function saveX() {
+	function saveX(x = state.x) {
 		const span = Math.max(1, layerWidth() - petWidth());
-		safeSet(X_KEY, String(state.x / span));
+		safeSet(X_KEY, String(x / span));
 	}
 
 	function loadX() {
 		const raw = Number.parseFloat(safeGet(X_KEY) ?? "");
-		const fraction = Number.isFinite(raw) ? clamp(raw, 0, 1) : 0.5;
+		const fraction = Number.isFinite(raw)
+			? clamp(raw, 0, 1)
+			: (profile.defaultX ?? 0.5);
 		const span = Math.max(0, layerWidth() - petWidth());
 		return clampX(fraction * span, layerWidth(), petWidth());
 	}
@@ -249,8 +273,7 @@ function initBannerPet() {
 		}
 		const k = Math.min(1, (time - tween.start) / tween.duration);
 		const eased = easeOutCubic(k);
-		const scale =
-			tween.fromScale + (tween.toScale - tween.fromScale) * eased;
+		const scale = tween.fromScale + (tween.toScale - tween.fromScale) * eased;
 		setX(tween.fromX + (tween.toX - tween.fromX) * eased, scale);
 		root.style.opacity = String(
 			tween.fromOpacity + (tween.toOpacity - tween.fromOpacity) * eased,
@@ -266,7 +289,7 @@ function initBannerPet() {
 	function placeBookmark() {
 		const width = bookmarkWidth();
 		const x = bookmarkX(state.savedX, petWidth(), width, layerWidth());
-		bookmark.style.setProperty("--clawd-bookmark-x", `${x}px`);
+		bookmark.style.setProperty("--pet-bookmark-x", `${x}px`);
 	}
 
 	function hidePet(time) {
@@ -458,13 +481,85 @@ function initBannerPet() {
 			react(now());
 		}
 	});
+
 	hideBtn.addEventListener("click", (event) => {
 		event.stopPropagation();
 		hidePet(now());
 	});
+
+	bookmark.addEventListener("pointerdown", (event) => {
+		if (event.pointerType === "mouse" && event.button !== 0) {
+			return;
+		}
+		if (!state.userHidden) {
+			return;
+		}
+		state.bookmarkDragging = true;
+		state.bookmarkDragged = false;
+		state.bookmarkStartX = event.clientX;
+		state.bookmarkStartSavedX = state.savedX;
+		state.bookmarkPointerId = event.pointerId;
+		bookmark.setPointerCapture(event.pointerId);
+		bookmark.classList.add("is-dragging");
+	});
+
+	bookmark.addEventListener("pointermove", (event) => {
+		if (
+			!state.bookmarkDragging ||
+			event.pointerId !== state.bookmarkPointerId
+		) {
+			return;
+		}
+		const dx = event.clientX - state.bookmarkStartX;
+		if (Math.abs(dx) > DRAG_THRESHOLD) {
+			state.bookmarkDragged = true;
+		}
+		if (!state.bookmarkDragged) {
+			return;
+		}
+		state.savedX = clampX(
+			state.bookmarkStartSavedX + dx,
+			layerWidth(),
+			petWidth(),
+		);
+		placeBookmark();
+	});
+
+	function endBookmarkDrag(event) {
+		if (
+			!state.bookmarkDragging ||
+			(event && event.pointerId !== state.bookmarkPointerId)
+		) {
+			return;
+		}
+		state.bookmarkDragging = false;
+		bookmark.classList.remove("is-dragging");
+		try {
+			bookmark.releasePointerCapture(state.bookmarkPointerId);
+		} catch {
+			// pointer capture may already be gone
+		}
+		state.bookmarkPointerId = null;
+		if (state.bookmarkDragged) {
+			saveX(state.savedX);
+			state.suppressBookmarkClick = true;
+			window.setTimeout(() => {
+				state.suppressBookmarkClick = false;
+			}, 0);
+		}
+	}
+
+	bookmark.addEventListener("pointerup", endBookmarkDrag);
+	bookmark.addEventListener("pointercancel", endBookmarkDrag);
 	bookmark.addEventListener("click", (event) => {
 		event.stopPropagation();
-		showPet(now());
+		if (state.suppressBookmarkClick) {
+			event.preventDefault();
+			return;
+		}
+		if (state.userHidden) {
+			showPet(now());
+		}
 	});
 
 	window.addEventListener("resize", remeasure);
@@ -483,6 +578,11 @@ function initBannerPet() {
 		new ResizeObserver(remeasure).observe(layer);
 	}
 
+	petInstances.push({
+		layer,
+		center: () => state.x + petWidth() / 2,
+	});
+
 	const hidden = safeGet(HIDDEN_KEY) === "1";
 	const startX = loadX();
 	state.savedX = startX;
@@ -490,7 +590,6 @@ function initBannerPet() {
 	if (hidden) {
 		state.userHidden = true;
 		state.mode = "hidden";
-		state.savedX = startX;
 		root.style.opacity = "0";
 		root.classList.add("is-user-hidden");
 		placeBookmark();
@@ -529,8 +628,19 @@ function initBannerPet() {
 	requestAnimationFrame(loop);
 }
 
+function initAllBannerPets() {
+	document.querySelectorAll("[data-banner-pet]").forEach((layer) => {
+		const profile = PET_PROFILES[layer.dataset.pet];
+		if (profile) {
+			initBannerPet(layer, profile);
+		}
+	});
+}
+
 if (document.readyState === "loading") {
-	document.addEventListener("DOMContentLoaded", initBannerPet, { once: true });
+	document.addEventListener("DOMContentLoaded", initAllBannerPets, {
+		once: true,
+	});
 } else {
-	initBannerPet();
+	initAllBannerPets();
 }

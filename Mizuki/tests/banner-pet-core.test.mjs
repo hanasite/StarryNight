@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
+import { PET_PROFILES } from "../src/scripts/banner-pet-profiles.js";
 import {
 	PET_CENTER_X,
 	PET_ROWS,
@@ -74,6 +75,14 @@ describe("sprite row metadata", () => {
 				assert.equal(center + frameCenterOffset(row, frame), PET_CENTER_X);
 			});
 		}
+	});
+
+	it("supports per-pet ground offsets and run compensation", () => {
+		assert.equal(groundOffsetForRow(0, PET_PROFILES.clawd), 42);
+		assert.equal(groundOffsetForRow(0, PET_PROFILES.deepseek), 7);
+		assert.equal(frameCenterOffset(1, 0, PET_PROFILES.clawd), 6.5);
+		assert.equal(frameCenterOffset(1, 0, PET_PROFILES.deepseek), 0);
+		assert.equal(frameCenterOffset(1, 7, PET_PROFILES.deepseek), 0);
 	});
 });
 
