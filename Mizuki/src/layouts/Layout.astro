@@ -2,6 +2,7 @@
 import { PageProgressBar } from "@components/control/PageProgressBar";
 import Pio from "@components/features/pio/Pio.astro";
 import ConfigCarrier from "@components/misc/ConfigCarrier.astro";
+import RainyKonbiniOverlay from "@components/misc/RainyKonbiniOverlay.svelte";
 import MusicPlayer from "@components/widgets/music-player/MusicPlayer.svelte";
 import { pioConfig, profileConfig, siteConfig } from "@/config";
 
@@ -265,6 +266,9 @@ if (siteConfig.font) {
 
 		<!-- Music Player - 核心始终加载（当enable=true），UI通过showFloatingPlayer控制 -->
 		<MusicPlayer client:idle />
+
+		<!-- 雨夜便利店全屏 3D 场景（从设置 → 特效设置打开） -->
+		<RainyKonbiniOverlay client:load />
 
 		<!-- Pio 看板娘组件 - 仅在进入视口时加载 -->
 		{pioConfig.enable && <Pio config={pioConfig} />}

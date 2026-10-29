@@ -198,6 +198,10 @@ function toggleSakuraEnabled() {
 	setSakuraEnabled(sakuraEnabled);
 }
 
+function openRainyKonbini() {
+	window.dispatchEvent(new CustomEvent("rainy-konbini:open"));
+}
+
 function switchWallpaperMode(newMode: WALLPAPER_MODE) {
 	wallpaperMode = newMode;
 	setWallpaperMode(newMode);
@@ -446,6 +450,15 @@ $effect(() => {
 							class:left-0.5={!sakuraEnabled}
 							class:left-5={sakuraEnabled}></div>
 					</div>
+				</button>
+				<!-- 雨夜便利店 3D 场景：https://github.com/Ri1035/rainy-konbini -->
+				<button
+					class="w-full btn-regular rounded-md py-2 px-3 flex items-center gap-3 text-left active:scale-95 transition-all relative overflow-hidden"
+					onclick={openRainyKonbini}
+				>
+					<Icon icon="material-symbols:storefront-outline" class="text-[1.25rem] shrink-0" />
+					<span class="text-sm flex-1">雨夜便利店</span>
+					<span class="text-[0.7rem] opacity-60">全屏 3D</span>
 				</button>
 			</div>
 		</div>
