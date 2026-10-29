@@ -199,7 +199,7 @@ function toggleSakuraEnabled() {
 }
 
 function openRainyKonbini() {
-	window.dispatchEvent(new CustomEvent("rainy-konbini:open"));
+	window.dispatchEvent(new CustomEvent("rainy-konbini:enable"));
 }
 
 function switchWallpaperMode(newMode: WALLPAPER_MODE) {

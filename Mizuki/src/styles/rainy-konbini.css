@@ -1,0 +1,41 @@
+/* Rainy-konbini site mode: full-screen scene background + bottom round menu. */
+
+body.rainy-konbini-mode {
+	background: #05070a;
+}
+
+body.rainy-konbini-mode #top-row,
+body.rainy-konbini-mode #navbar-wrapper,
+body.rainy-konbini-mode #banner-wrapper,
+body.rainy-konbini-mode #banner-page-overlay,
+body.rainy-konbini-mode .banner-pet-layer,
+body.rainy-konbini-mode [data-fullscreen-wallpaper],
+body.rainy-konbini-mode #display-setting,
+body.rainy-konbini-mode #nav-menu-panel,
+body.rainy-konbini-mode #back-to-top-btn,
+body.rainy-konbini-mode #canvas_sakura,
+body.rainy-konbini-mode #floating-controls,
+body.rainy-konbini-mode .floating-controls,
+body.rainy-konbini-mode .music-player,
+body.rainy-konbini-mode .music-player-fab,
+body.rainy-konbini-mode #music-player,
+body.rainy-konbini-mode #page-progress-bar,
+body.rainy-konbini-mode #page-height-extend {
+	display: none !important;
+}
+
+/* Scene-only: the 3D scene is the page. */
+body.rainy-konbini-scene .absolute.w-full.z-30 {
+	display: none !important;
+}
+
+body.rainy-konbini-scene,
+html:has(body.rainy-konbini-scene) {
+	overflow: hidden !important;
+}
+
+/* Page content over the scene (overlay wallpaper mode). */
+body.rainy-konbini-content .absolute.w-full.z-30 {
+	top: 1rem !important;
+	min-height: 100vh !important;
+}
